@@ -1,0 +1,94 @@
+package cn.com.tf.handler.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import cn.com.hypt.db.dao.VehicleMapper;
+import cn.com.hypt.db.model.Terminal;
+import cn.com.hypt.db.model.TerminalVehicle;
+import cn.com.hypt.db.model.Vehicle;
+import cn.com.hypt.db.model.VehicleExample;
+import cn.com.tf.cache.ITerminalCacheManager;
+import cn.com.tf.cache.ITmnlVehiCacheManager;
+import cn.com.tf.cache.IVehicleCacheManager;
+import cn.com.tf.handler.IJt808Handler;
+import cn.com.tf.protocol.Jt808Message;
+import cn.com.tf.protocol.Jt808MessageHead;
+import cn.com.tf.protocol.impl.JT0100;
+import cn.com.tf.protocol.impl.JT8100;
+import cn.com.tf.tool.JT808Constants;
+
+/**
+ * 终端注册处理器
+ * @author tianfei
+ *
+ */
+@Component("jt0100Handler")
+public class JT0100Handler extends IJt808Handler {
+	private transient Logger logger = LoggerFactory.getLogger(JT0100Handler.class);
+	
+	@Autowired
+	private ITerminalCacheManager terminalCacheManager;
+
+	@Autowired
+	private ITmnlVehiCacheManager tmnlVehicleCacheManager;
+	
+	@Autowired
+	private IVehicleCacheManager vehicleCacheManager;
+	
+	@Override
+	public void handle(Jt808Message msg) {
+		optResult = JT808Constants.TERMINAL_REGISTER_SUCCESS;
+		logger.info("终端注册操作！"+msg.getBody().toString());
+		String simNo = msg.getSimNo();
+		Terminal tmnl = terminalCacheManager.getTerminalBySimNo(simNo);
+		if(tmnl == null){
+			logger.info("终端注册失败，终端不存在 ："+ simNo);
+			optResult = JT808Constants.TERMINAL_REGISTER_TERMINAL_NOT_EXIST;
+		} else {
+			// 查询终端关系是否已经绑定
+			TerminalVehicle tv = tmnlVehicleCacheManager.findCurBindRelationsByTerminalId(tmnl.getTerminalId());
+			if(tv != null){
+				logger.info("终端注册失败，终端已经注册："+tv.getTerminalId());
+				optResult = JT808Constants.TERMINAL_REGISTER_VEHICLE_HAD_EXIST;
+			} else {
+				JT0100 body = (JT0100) msg.getBody();
+				//查询 车辆信息
+				String licensePlate = body.getLicensePlate();
+				Vehicle vehicle = vehicleCacheManager.findVehicleByPlate(licensePlate);
+				if(vehicle != null){
+					//判断车辆是否已经注册
+					tv = tmnlVehicleCacheManager.findCurBindRelationsByVehicleId(vehicle.getVehicleId());
+					if(tv != null){
+						logger.info("终端注册失败，车辆已经注册："+vehicle.getLicensePlate());
+						optResult = JT808Constants.TERMINAL_REGISTER_VEHICLE_HAD_EXIST;
+					} else {
+						//终端注册,保存关联关系
+						tv = new TerminalVehicle();
+						tv.setTerminalId(tmnl.getTerminalId());
+						tv.setVehicleId(vehicle.getVehicleId());
+						tmnlVehicleCacheManager.addBindRelation(tv);
+						//保存终端绑定
+						tmnl.setBindTime(new Date());
+						terminalCacheManager.addOrUpdateTerminal(tmnl);
+					}
+				} else {
+					logger.info("终端注册失败，车辆不存在："+body.getLicensePlate());
+					optResult = JT808Constants.TERMINAL_REGISTER_VEHICLE_NOT_EXIST;
+				}
+			}
+		}
+		
+		// 消息回复
+		JT8100 body = new JT8100(msg.getHead().getFlowNo(),optResult,JT808Constants.AUTHENTICATION_CODE);
+		Jt808MessageHead head = msg.getHead();
+		head.setMessageId(0x8100);
+		Jt808Message response = new Jt808Message(head,body);
+		writeResponse(response);
+	}
+}
