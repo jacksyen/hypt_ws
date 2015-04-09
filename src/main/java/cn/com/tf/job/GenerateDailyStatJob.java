@@ -6,10 +6,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import cn.com.hypt.db.dao.DailyStatMapper;
 import cn.com.hypt.db.dao.RefuelMapper;
 import cn.com.hypt.db.model.DailyStat;
@@ -26,7 +27,7 @@ import cn.com.tf.tool.DateUtil;
  * @author tianfei
  *
  */
-@Service("generateDailyStat")
+@Component("generateDailyStatJob")
 public class GenerateDailyStatJob {
 
 	private static Logger logger = LoggerFactory

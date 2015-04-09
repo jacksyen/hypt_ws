@@ -2,13 +2,15 @@ package cn.com.tf.job;
 
 import java.util.Date;
 import java.util.List;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import cn.com.hypt.db.dao.TripMapper;
 import cn.com.hypt.db.model.Trip;
 import cn.com.tf.cache.ITripCacheManager;
@@ -21,7 +23,7 @@ import cn.com.tf.tool.DateUtil;
  * @author tianfei
  *
  */
-@Service("generateTripJob")
+@Component("generateTripJob")
 public class GenerateTripJob {
 
 	private static Logger logger = LoggerFactory.getLogger(GenerateTripJob.class);

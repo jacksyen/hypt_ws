@@ -2,8 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  
-">
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  ">
 	<context:annotation-config />
 	<context:component-scan base-package="cn.com.tf" />
 	<import resource="spring-mybatis.xml" />
@@ -20,11 +19,11 @@
 	</bean>
 
 	<!-- 定时器 -->
-	<!-- 定义调用对象和调用对象的方法 -->
-	<bean id="jobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<!-- 生成日统计任务 -->
+	<bean id="dailyJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<!-- 调用的类 -->
 		<property name="targetObject">
-			<ref bean="generateDailyStat" />
+			<ref bean="generateDailyStatJob" />
 		</property>
 		<!-- 调用类中的方法 -->
 		<property name="targetMethod">
@@ -32,9 +31,30 @@
 		</property>
 	</bean>
 	<!-- 定义触发时间 -->
-	<bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	<bean id="dailyTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail">
-			<ref bean="jobtask" />
+			<ref bean="dailyJob" />
+		</property>
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 26 18 * * ?</value>
+		</property>
+	</bean>
+	<!-- 生成轨迹任务 -->
+	<bean id="tripJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject">
+			<ref bean="generateTripJob" />
+		</property>
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod">
+			<value>execute</value>
+		</property>
+	</bean>
+	<!-- 定义触发时间 -->
+	<bean id="tripTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="tripJob" />
 		</property>
 		<!-- cron表达式 -->
 		<property name="cronExpression">
@@ -46,7 +66,8 @@
 		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<ref bean="doTime" />
+				<ref bean="dailyTime" />
+				<ref bean="tripTime" />
 			</list>
 		</property>
 	</bean>
