@@ -1,18 +1,14 @@
 package cn.com.tf.handler.impl;
 
 import java.util.Date;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import cn.com.hypt.db.dao.VehicleMapper;
 import cn.com.hypt.db.model.Terminal;
 import cn.com.hypt.db.model.TerminalVehicle;
 import cn.com.hypt.db.model.Vehicle;
-import cn.com.hypt.db.model.VehicleExample;
 import cn.com.tf.cache.ITerminalCacheManager;
 import cn.com.tf.cache.ITmnlVehiCacheManager;
 import cn.com.tf.cache.IVehicleCacheManager;
