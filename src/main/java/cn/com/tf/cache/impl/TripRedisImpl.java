@@ -20,6 +20,7 @@ public class TripRedisImpl implements ITripCacheManager {
 	// 车辆编号与终端编号的关系
 	private static final String GPS_TRIP_TERMINAL_PREFIX = "jt808:trip:tid:";
 
+	
 	@Override
 	public void pushGpsRecord(JSONObject gpsInfo) {
 		//yyyymmdd
