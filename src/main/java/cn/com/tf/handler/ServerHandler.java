@@ -1,6 +1,7 @@
 package cn.com.tf.handler;
 
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -9,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import cn.com.hypt.db.model.Terminal;
+import cn.com.tf.cache.IDataAcquireCacheManager;
+import cn.com.tf.cache.ITerminalCacheManager;
 import cn.com.tf.protocol.Jt808Message;
 import cn.com.tf.server.Connection;
 
@@ -22,6 +27,12 @@ public class ServerHandler extends IoHandlerAdapter {
 	
 	@Autowired
 	private UpDataHandler updateHandler;
+	
+	@Autowired
+	private ITerminalCacheManager terminalCacheManager;
+	
+	@Autowired
+	private IDataAcquireCacheManager dataAcquireCacheManager;
 	
 	/**
 	 * 服务器连接状态，KEY:SIM号； VALUE:连接状态
@@ -48,6 +59,8 @@ public class ServerHandler extends IoHandlerAdapter {
 			if (conn != null) {
 				conn.setConnected(false);
 				conn.setDisconnectTimes(conn.getDisconnectTimes() + 1);
+				// 设置终端离线
+				dataAcquireCacheManager.setIsOnline(conn.getTerminalId(), false);
 			}
 		}
 		session.close(true);
@@ -73,6 +86,7 @@ public class ServerHandler extends IoHandlerAdapter {
 		session.setAttribute("simNo", message.getSimNo());
 		Connection conn = getConnection(session.getId(), message);
 		if(conn != null){
+			message.setConn(conn);
 			updateHandler.add(message);
 		}
 		logger.info("接收消息："+ message.toString());
@@ -80,26 +94,37 @@ public class ServerHandler extends IoHandlerAdapter {
 
 	@Override
 	public void messageSent(IoSession session, Object message) throws Exception {
-		logger.info("服务器发送消息成功...");
+//		logger.info("服务器发送消息成功...");
 	}
 	
 	public Connection getConnection(String simNo){
 		return serverConns.get(simNo);
 	}
 	
+	public ConcurrentHashMap<String, Connection> getServerConns() {
+		return serverConns;
+	}
+
 	private Connection getConnection(long sessionId, Jt808Message msg) {
 		if (msg == null || msg.getSimNo() == null) {
 			return null;
 		}
 		Connection conn = serverConns.get(msg.getSimNo());
 		if (conn == null) {
+			Terminal tmnl = terminalCacheManager.getTerminalBySimNo(msg.getSimNo());
+			if(tmnl == null){
+				logger.error("sim卡号："+msg.getSimNo()+"的终端未在该平台注册！");
+				return null;
+			}
+			//设置终端在线
+			dataAcquireCacheManager.setIsOnline(tmnl.getTerminalId(), true);
 			conn = new Connection(msg.getSimNo(), sessionId);
+			conn.setTerminalId(tmnl.getTerminalId());
 			serverConns.put(msg.getSimNo(), conn);
 		} else if (conn.getSessionId() != sessionId) {
 			// 重新进行的连接
 			conn.setConnected(true);
 			conn.setSessionId(sessionId);
-			
 			logger.info(String.format("SIM卡号为:%s 的设备重新接入平台", msg.getSimNo()));
 		}
 		return conn;

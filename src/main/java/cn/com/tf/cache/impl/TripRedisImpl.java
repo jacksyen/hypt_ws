@@ -4,7 +4,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import cn.com.tf.cache.ITripCacheManager;
+import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.ShardedJedisPoolFactory;
 import redis.clients.jedis.ShardedJedis;
 import net.sf.json.JSONObject;
@@ -24,8 +26,7 @@ public class TripRedisImpl implements ITripCacheManager {
 	@Override
 	public void pushGpsRecord(JSONObject gpsInfo) {
 		//yyyymmdd
-		int recvDay = Integer.parseInt(gpsInfo.optString("sendTime")
-				.substring(0, 10).replace("-", ""));
+		long recvDay = DateUtil.formatDate(gpsInfo.getString("sendTime")).getTime();
 		String key = getRedisKey(gpsInfo.optInt("vid"), recvDay);
 		JSONObject record = JSONObject.fromObject(gpsInfo);
 		ShardedJedis shardedJedis = null;
@@ -107,7 +108,7 @@ public class TripRedisImpl implements ITripCacheManager {
 		}
 	}
 
-	private String getRedisKey(int vehicleId, int recvDay) {
+	private String getRedisKey(int vehicleId, long recvDay) {
 		String key = GPS_TRIP_GPS_PREFIX + recvDay + ":" + vehicleId;
 		return key;
 	}

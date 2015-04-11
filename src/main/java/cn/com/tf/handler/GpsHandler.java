@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.cache.ITripCacheManager;
 import cn.com.tf.model.GpsInfo;
+import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.LocationTool;
 
 /**
@@ -114,11 +115,13 @@ public class GpsHandler {
 			gpsData.put("recordVelocity", String.valueOf(gpsInfo.getRecordVelocity()));
 			gpsData.put("vid", gpsInfo.getVid());
 			gpsData.put("tid", gpsInfo.getTid());
-			gpsData.put("sendTime", gpsInfo.getSendTime());
+			String sendTime = DateUtil.TIMEFORMATER1().format(gpsInfo.getSendTime());
+			gpsData.put("sendTime", sendTime);
 			//保存车辆当前位置 
 			dataAcquireCacheManager.setGps(gpsData);
 			//保存车辆行程轨迹点
 			tripCacheManager.pushGpsRecord(gpsData);
+			logger.info(String.format("保存车辆【%s  %s】轨迹点成功。",gpsInfo.getVid(),sendTime));
 		}
 		
 	}

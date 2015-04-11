@@ -2,6 +2,7 @@ package cn.com.tf.protocol;
 
 import java.nio.ByteBuffer;
 
+import cn.com.tf.server.Connection;
 import cn.com.tf.tool.Tools;
 
 /**
@@ -14,6 +15,8 @@ public class Jt808Message {
 	private Jt808MessageHead head;		//头消息体
 	
 	private Jt808MessageBody body;		//消息体
+	
+	private Connection conn;			//连接信息
 	
 	public Jt808Message(){}
 	
@@ -31,10 +34,14 @@ public class Jt808Message {
 		return Tools.ToHexString4Short((short) head.getMessageId());
 	}
 	
+	/**
+	 * 查询 SIM卡号
+	 * @return
+	 */
 	public String getSimNo(){
 		return head.getTephone();
 	}
-
+	
 	public Jt808MessageHead getHead() {
 		return head;
 	}
@@ -49,6 +56,14 @@ public class Jt808Message {
 
 	public void setBody(Jt808MessageBody body) {
 		this.body = body;
+	}
+
+	public Connection getConn() {
+		return conn;
+	}
+
+	public void setConn(Connection conn) {
+		this.conn = conn;
 	}
 
 	@Override

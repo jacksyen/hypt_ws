@@ -23,6 +23,10 @@ public class Connection {
 	private int errorPacketNum;
 	// 是否已连接
 	private boolean connected;
+	// 终端ID
+	private int terminalId;
+	// 是否鉴权成功
+	private boolean isAuth = false;
 	
 	public Connection(String simNo,long sessionId){
 		this.simNo = simNo;
@@ -88,5 +92,21 @@ public class Connection {
 	}
 	public void setConnected(boolean connected) {
 		this.connected = connected;
+	}
+
+	public int getTerminalId() {
+		return terminalId;
+	}
+
+	public void setTerminalId(int terminalId) {
+		this.terminalId = terminalId;
+	}
+
+	public boolean isAuth() {
+		return isAuth;
+	}
+
+	public void setAuth(boolean isAuth) {
+		this.isAuth = isAuth;
 	}
 }

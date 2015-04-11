@@ -1,7 +1,6 @@
 package cn.com.tf.server;
 
 import java.net.InetSocketAddress;
-
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -13,12 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import cn.com.tf.codec.Jt808CodecFactory;
-import cn.com.tf.handler.DownDataHandler;
-import cn.com.tf.handler.GpsHandler;
 import cn.com.tf.handler.ServerHandler;
-import cn.com.tf.handler.UpDataHandler;
 import cn.com.tf.protocol.Jt808Message;
 
 /**
@@ -34,14 +29,7 @@ public class MinaServer {
 	private volatile boolean starting = false;
 	
 	@Autowired
-	private UpDataHandler upDataHandler;
-	
-	@Autowired
-	private DownDataHandler downDataHandler;
-	@Autowired
 	private ServerHandler serverHandler;
-	@Autowired
-	private GpsHandler gpsHandler;
 	
 	private NioSocketAcceptor acceptor = null;
 	
@@ -49,34 +37,36 @@ public class MinaServer {
 	 * 启动服务
 	 */
 	public void startServer(){
-		try{
-			//创建非阻塞的SERVER端的SOCKET
-			acceptor = new NioSocketAcceptor();
+		synchronized (this) {
+			if(acceptor == null){
+				try{
+					//创建非阻塞的SERVER端的SOCKET
+					acceptor = new NioSocketAcceptor();
 //			acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"),
 //					LineDelimiter.WINDOWS.getValue(),LineDelimiter.WINDOWS.getValue())));
-			acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Jt808CodecFactory()));
-			//设置读取数据的缓冲区大小
-			acceptor.getSessionConfig().setReadBufferSize(1024);
-			//读写通道10秒内无操作进入空闲状态
-			acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
-			//心跳机制设置
-//			KeepAliveRequestTimeoutHandler heartBeatHandler = new KeepAliveRequestTimeoutHandlerImpl();
-//			KeepAliveMessageFactory heartBeatFactory = new KeepAliveMessageFactoryImpl();
-//			KeepAliveFilter heartBeat = new KeepAliveFilter(heartBeatFactory,IdleStatus.BOTH_IDLE,heartBeatHandler);
-//			heartBeat.setForwardEvent(true);
-//			heartBeat.setRequestInterval(120);
-//			acceptor.getFilterChain().addLast("heartbeat", heartBeat);
-			//绑定业务处理器
-			acceptor.setHandler(serverHandler);
-			acceptor.bind(new InetSocketAddress(SERVER_PORT));
-			//TODO:启动上行、下行消息处理器 
-			upDataHandler.startHandler();
-			downDataHandler.startHandler();
-			gpsHandler.startHandler();
-			starting = true;
-			logger.info("服务器启动成功！端口号："+SERVER_PORT);
-		} catch (Exception e) {
-			logger.info("服务启动失败！错误信息："+e.getMessage());
+					acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Jt808CodecFactory()));
+					//设置读取数据的缓冲区大小
+					acceptor.getSessionConfig().setReadBufferSize(1024);
+					//读写通道10秒内无操作进入空闲状态
+					acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
+					//心跳机制设置
+					KeepAliveRequestTimeoutHandler heartBeatHandler = new KeepAliveRequestTimeoutHandlerImpl();
+					KeepAliveMessageFactory heartBeatFactory = new KeepAliveMessageFactoryImpl();
+					KeepAliveFilter heartBeat = new KeepAliveFilter(heartBeatFactory,IdleStatus.BOTH_IDLE);
+					heartBeat.setForwardEvent(true);
+					heartBeat.setRequestInterval(30);//心跳5分钟超时
+					acceptor.getFilterChain().addLast("heartbeat", heartBeat);
+					//绑定业务处理器
+					acceptor.setHandler(serverHandler);
+					acceptor.bind(new InetSocketAddress(SERVER_PORT));
+					starting = true;
+					logger.info("服务器启动成功！端口号："+SERVER_PORT);
+				} catch (Exception e) {
+					logger.info("服务启动失败！错误信息："+e.getMessage());
+				}
+			} else {
+				logger.error("MINA服务已经启动");
+			}
 		}
 	}
 	
@@ -100,10 +90,10 @@ public class MinaServer {
 	private static class KeepAliveMessageFactoryImpl implements KeepAliveMessageFactory{
 		@Override
 		public boolean isRequest(IoSession session, Object message) {
-			logger.info("isRequest");
 			if(message instanceof Jt808Message){
 				Jt808Message msg = (Jt808Message) message;
 				if(msg.getHead().getMessageId() == 0x002){
+					logger.info("接收到心跳包");
 					return true;
 				}
 			}
@@ -113,21 +103,24 @@ public class MinaServer {
 		@Override
 		public boolean isResponse(IoSession session, Object message) {
 			// TODO Auto-generated method stub
-			logger.info("isResponse");
 			return false;
 		}
 
 		@Override
 		public Object getRequest(IoSession session) {
-			// TODO Auto-generated method stub
-			logger.info("getRequest");
+			//心跳超时，断开连接 
+			session.close(true);
 			return null;
 		}
 
 		@Override
 		public Object getResponse(IoSession session, Object request) {
-			// TODO Auto-generated method stub
-			logger.info("getResponse");
+			if(request instanceof Jt808Message){
+				Jt808Message msg = (Jt808Message) request;
+				if(msg.getHead().getMessageId() == 0x002){
+					logger.info("发送心跳包响应");
+				}
+			}
 			return null;
 		}
 	}

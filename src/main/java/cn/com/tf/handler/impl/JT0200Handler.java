@@ -13,6 +13,7 @@ import cn.com.hypt.db.model.TerminalVehicle;
 import cn.com.hypt.db.model.Vehicle;
 import cn.com.tf.handler.GpsHandler;
 import cn.com.tf.handler.IJt808Handler;
+import cn.com.tf.handler.RunningStatusHandler;
 import cn.com.tf.model.GpsInfo;
 import cn.com.tf.protocol.EMsgAck;
 import cn.com.tf.protocol.Jt808Message;
@@ -34,6 +35,9 @@ public class JT0200Handler extends IJt808Handler {
 	
 	@Autowired
 	private GpsHandler gpsHandler;
+	
+	@Autowired
+	private RunningStatusHandler runningStatusHandler;
 
 	@Override
 	public void handle(Jt808Message msg) {
@@ -63,6 +67,7 @@ public class JT0200Handler extends IJt808Handler {
 		if(tv != null){
 			vehicle = vehicleCacheManager.findVehicleById(tv.getVehicleId());
 			if(vehicle != null){
+				gi.setVid(vehicle.getVehicleId());
 				if(body.getSpeed() > 1){
 					dataAcquireCacheManager.setRunningStatus(vehicle.getVehicleId(), JT808Constants.VEHICLE_RUNNING_STATUS_RUNNING);
 					gi.setRunStatus(JT808Constants.VEHICLE_RUNNING_STATUS_RUNNING);
@@ -74,8 +79,12 @@ public class JT0200Handler extends IJt808Handler {
 				Logger.error("车辆不存在 ！");
 				return;
 			}
+		} else {
+			Logger.error("终端未绑定车辆，SIM:"+ msg.getSimNo());
+			return;
 		}
 		//组装GPS信息
+		gi.setTid(tmnl.getTerminalId());
 		gi.setSendTime(dt);
 		gi.setPlateNo(vehicle.getLicensePlate());
 		gi.setSimNo(msg.getSimNo());
@@ -92,6 +101,7 @@ public class JT0200Handler extends IJt808Handler {
 		gi.setStatus(body.getStatus());
 		//位置信息处理
 		gpsHandler.addGps(gi);
+		runningStatusHandler.processData(gi);
 		//TODO:待处理告警
 		
 		//回复消息
@@ -101,5 +111,4 @@ public class JT0200Handler extends IJt808Handler {
 		Jt808Message response = new Jt808Message(head,rbody);
 		writeResponse(response);
 	}
-
 }

@@ -6,14 +6,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import cn.com.hypt.db.model.Terminal;
-import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.cache.ITerminalCacheManager;
 import cn.com.tf.protocol.Jt808Message;
 
@@ -39,9 +35,6 @@ public class UpDataHandler {
 	
 	@Autowired
 	private ITerminalCacheManager terminalCacheManager;
-	
-	@Autowired
-	private IDataAcquireCacheManager dataAcquireCacheManager;
 	
 	/**
 	 * 启动处理器
@@ -75,8 +68,6 @@ public class UpDataHandler {
 	 */
 	public void add(Jt808Message msg) {
 		try {
-			//TODO:判断终端是否存在
-			
 			updataQueue.put(msg);
 		} catch (InterruptedException e) {
 		}
@@ -97,13 +88,18 @@ public class UpDataHandler {
 
 		@Override
 		public void run() {
+			//判断终端是否已经鉴权
+			if(!msg.getConn().isAuth() && msg.getHead().getMessageId() != 0x0100 && msg.getHead().getMessageId() != 0x0102){
+				logger.error("终端未鉴权，SIM："+msg.getSimNo());
+				return;
+			}
+			//判断终端是否存在
 			Terminal tmnl = terminalCacheManager.getTerminalBySimNo(msg.getSimNo());
 			if(tmnl == null){
 				logger.error("sim卡号："+msg.getSimNo()+"的终端未在该平台注册！");
 				return;
 			}
-			//设置终端在线
-			dataAcquireCacheManager.setIsOnline(tmnl.getTerminalId(), true);
+			//调用 消息处理器
 			IJt808Handler h =  codeHandler.get(msg.getMessageID());
 			if(h != null){
 				h.handle(msg);

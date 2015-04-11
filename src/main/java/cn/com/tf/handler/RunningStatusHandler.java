@@ -98,15 +98,15 @@ public class RunningStatusHandler {
 		public void run() {
 			// 最近一条车辆状态
 			RunningState lastrs = runningStatusCacheManager.findLatestRunningState(gpsInfo.getVid(),new Date());
-			if (null != lastrs) {
-				long preTime = lastrs.getReceivedTime().getTime();
-				long nowTime = gpsInfo.getSendTime().getTime();
-
-				if ((nowTime - preTime) < 0
-						|| ((nowTime - preTime) / 60000) < 4) {
-					return;
-				}
-			}
+//			if (null != lastrs) {
+//				long preTime = lastrs.getReceivedTime().getTime();
+//				long nowTime = gpsInfo.getSendTime().getTime();
+//
+//				if ((nowTime - preTime) < 0
+//						|| ((nowTime - preTime) / 60000) < 4) {
+//					return;
+//				}
+//			}
 			// 当前车辆状态
 			RunningState curr = new RunningState(gpsInfo);
 			// 保存当前车辆状态

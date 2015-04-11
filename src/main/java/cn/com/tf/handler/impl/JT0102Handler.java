@@ -29,6 +29,9 @@ public class JT0102Handler extends IJt808Handler {
 		if(!JT808Constants.AUTHENTICATION_CODE.equals(code)){
 			logger.error("终端鉴权失败，"+msg.getSimNo());
 			optResult = EMsgAck.FAILURE.value();
+		} else {
+			//设置连接鉴权成功
+			msg.getConn().setAuth(true);
 		}
 		//消息回复
 		Jt808MessageHead head = msg.getHead();
