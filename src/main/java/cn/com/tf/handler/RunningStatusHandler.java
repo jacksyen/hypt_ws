@@ -129,7 +129,7 @@ public class RunningStatusHandler {
 			double curMileage = curState.getMileage();
 			double prevMileage = prevState.getMileage();
 			double refuelAmount = curFuelAmount - prevFuelAmount;
-			if ((refuelAmount >= 15)
+			if ((refuelAmount >= 5)
 					&& ((curMileage - prevMileage <= 10) || (curState
 							.getReceivedTime().getTime()
 							- prevState.getReceivedTime().getTime() <= 15 * 60 * 1000))) {
@@ -140,7 +140,9 @@ public class RunningStatusHandler {
 				refuel.setMileage(new BigDecimal(curState.getMileage()));
 				refuel.setFuelAmount(new BigDecimal(prevFuelAmount)); // 加油前油量
 				refuel.setRefuelAmount(new BigDecimal(refuelAmount)); // 加油量
-				refuelMapper.insert(refuel);
+				refuel.setCreated(new Date());
+				// 查询加油位置信息
+				refuelMapper.insertSelective(refuel);
 			}
 		}
 

@@ -11,9 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import cn.com.hypt.db.dao.DailyStatMapper;
 import cn.com.hypt.db.dao.RefuelMapper;
 import cn.com.hypt.db.model.DailyStat;
+import cn.com.hypt.db.model.DailyStatExample;
 import cn.com.hypt.db.model.Refuel;
 import cn.com.hypt.db.model.RefuelExample;
 import cn.com.tf.cache.IRunningStatusCacheManager;
@@ -53,13 +55,13 @@ public class GenerateDailyStatJob {
 	 * 执行日统计方法
 	 */
 	public void execute() {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		calendar.set(Calendar.DAY_OF_MONTH, -1);
+		Date occurTime = DateUtil.addDate(DateUtil.formatDate(new Date()), -1);
+		int occurDay = Integer.parseInt(DateUtil.DATEFORMATER().format(occurTime));
 		List<Integer> list = vehicleCacheManager.findAllVehicleIds();
 		for (int vehicleId : list) {
-			logger.info("对车辆【%d】执行日统计");
-			updateDailyStat(vehicleId, calendar.getTime());
+			logger.info(String.format("对车辆【%d】【%d】执行日统计开始",vehicleId,occurDay));
+			updateDailyStat(vehicleId,occurDay, new Date());
+			logger.info(String.format("对车辆【%d】【%d】执行日统计结束",vehicleId,occurDay));
 		}
 
 	}
@@ -69,30 +71,38 @@ public class GenerateDailyStatJob {
 	 * @param vehicleId
 	 * @param date
 	 */
-	private void updateDailyStat(int vehicleId, Date date){
+	private void updateDailyStat(int vehicleId,int occurDay, Date occurTime){
 		//查询车辆运行状态集合
-		RunningState stat = runningStatusCacheManager.findLatestRunningState(vehicleId, date);
-		DailyStat dailyStat = new DailyStat();
-		dailyStat.setOccurDate(date);
-
+		RunningState stat = runningStatusCacheManager.findLatestRunningState(vehicleId, occurTime);
+		if(stat == null){
+			return;
+		}
 		BigDecimal fuelIncount = new BigDecimal(0);
 		BigDecimal mileageIncount = new BigDecimal(0);
 		BigDecimal lper100km = new BigDecimal(0);
 		BigDecimal rper100km = new BigDecimal(0);
 		//计算里程和油耗
-		double[] calcData = calcFuelAndMileage(vehicleId, date);
+		double[] calcData = calcFuelAndMileage(vehicleId, occurTime);
 		if (calcData != null) {
 			fuelIncount = BigDecimal.valueOf(calcData[0]);
 			mileageIncount = BigDecimal.valueOf(calcData[1]);
 		}
+		DailyStat dailyStat = new DailyStat();
+		dailyStat.setOccurDate(occurDay);
 		dailyStat.setFuelAmount(BigDecimal.valueOf(stat.getGas()));			//当前油量
 		dailyStat.setMileage(BigDecimal.valueOf(stat.getMileage()));	//当前里程
 		dailyStat.setVehicleId(vehicleId);
 		dailyStat.setFuelIncount(fuelIncount.setScale(2, RoundingMode.HALF_UP));	//当日油耗量
 		dailyStat.setMileageIncount(mileageIncount);			//当日行驶里程
-		dailyStat.setRefuel(BigDecimal.valueOf(getRefule(vehicleId, date)));	//加油量
+		dailyStat.setRefuel(BigDecimal.valueOf(getRefule(vehicleId, occurTime)));	//加油量
 		dailyStat.setFuelPer100km(lper100km);					//当日百公里油耗
 		dailyStat.setFeePer100km(rper100km);					//百公里油费
+		dailyStat.setCreated(new Date());
+		//清空已经存在日统计
+		DailyStatExample example = new DailyStatExample();
+		example.or().andOccurDateEqualTo(occurDay);
+		dailyStatMapper.deleteByExample(example);
+		//添加新的日统计
 		dailyStatMapper.insertSelective(dailyStat);
 		//TODO:计算车辆月统计
 	}
@@ -106,18 +116,10 @@ public class GenerateDailyStatJob {
 		programStart = System.currentTimeMillis();
 
 		double[] calcData = null;
-		Date endDate = DateUtil.addDate(date, 1);
 		List<RunningState> runningStates = null;
 		normalQueryStart = System.currentTimeMillis();
 		runningStates = runningStatusCacheManager.findRunningStates(vehicleId,
-				endDate);
-		normalQueryEnd = System.currentTimeMillis();
-
-		logger.debug("查询RunningStatus表,参数[vehicleId=" + vehicleId
-				+ "][receivedTime_start="
-				+ DateUtil.TIMEFORMATER1().format(date) + "][receivedTime_end="
-				+ DateUtil.TIMEFORMATER1().format(endDate) + "],共耗时"
-				+ (normalQueryEnd - normalQueryStart) + "ms");
+				date);
 
 		if (runningStates != null && runningStates.size() > 0) {
 

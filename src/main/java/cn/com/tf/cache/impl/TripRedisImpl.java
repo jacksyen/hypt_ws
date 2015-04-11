@@ -26,7 +26,7 @@ public class TripRedisImpl implements ITripCacheManager {
 	@Override
 	public void pushGpsRecord(JSONObject gpsInfo) {
 		//yyyymmdd
-		long recvDay = DateUtil.formatDate(gpsInfo.getString("sendTime")).getTime();
+		int recvDay = Integer.parseInt(gpsInfo.getString("sendTime").substring(0,10).replace("-", ""));
 		String key = getRedisKey(gpsInfo.optInt("vid"), recvDay);
 		JSONObject record = JSONObject.fromObject(gpsInfo);
 		ShardedJedis shardedJedis = null;

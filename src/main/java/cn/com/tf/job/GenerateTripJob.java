@@ -11,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import cn.com.hypt.db.dao.TripMapper;
 import cn.com.hypt.db.model.Trip;
+import cn.com.hypt.db.model.TripExample;
 import cn.com.tf.cache.ITripCacheManager;
 import cn.com.tf.cache.IVehicleCacheManager;
 import cn.com.tf.tool.DateUtil;
@@ -45,7 +47,9 @@ public class GenerateTripJob {
 		int occurDay = Integer.parseInt(DateUtil.DATEFORMATER().format(occurTime));
 		List<Integer> list = vehicleCacheManager.findAllVehicleIds();
 		for(Integer vehicleId : list){
+			logger.info(String.format("生成车辆【%d】【%d】行驶轨迹开始",vehicleId,occurDay));
 			generateGpsTrip(occurTime, occurDay, vehicleId);
+			logger.info(String.format("生成车辆【%d】【%d】行驶轨迹结束",vehicleId,occurDay));
 		}
 	}
 
@@ -74,9 +78,15 @@ public class GenerateTripJob {
 			Trip gpsTrip = new Trip();
 			gpsTrip.setVehicleId(vehicleId);
 			gpsTrip.setGps(array.toString());
-			//保存轨迹信息
-			tripMapper.insertSelective(gpsTrip);
+			gpsTrip.setRecday(occurDay);
+			gpsTrip.setCreated(new Date());
 			try {
+				//删除当天已经存在轨迹
+				TripExample example = new TripExample();
+				example.or().andRecdayEqualTo(occurDay);
+				tripMapper.deleteByExample(example);
+				//保存轨迹信息
+				tripMapper.insertSelective(gpsTrip);
 				tripCacheManager.deleteGpsTrip(vehicleId,occurDay);
 			} catch (Exception e) {
 				logger.error(e.getMessage());

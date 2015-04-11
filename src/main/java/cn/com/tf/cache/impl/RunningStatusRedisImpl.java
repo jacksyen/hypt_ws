@@ -15,6 +15,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import cn.com.tf.cache.IRunningStatusCacheManager;
 import cn.com.tf.model.RunningState;
 import cn.com.tf.tool.DateUtil;
+import cn.com.tf.tool.JsonPluginsUtil;
 import cn.com.tf.tool.ShardedJedisPoolFactory;
 
 @Service
@@ -32,15 +33,13 @@ public class RunningStatusRedisImpl implements IRunningStatusCacheManager {
 	public RunningState findLatestRunningState(int vehicleId,Date date) {
 		String key = getKey(vehicleId, date);
 		ShardedJedis shardedJedis = null;
-		JSONObject src = null;
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			List<String> srcList = shardedJedis.lrange(key, -1, -1);
 			if (srcList == null || srcList.size() == 0) {
 				return null;
 			}
-			src = JSONObject.fromObject(srcList.get(0));
-			RunningState res = (RunningState) JSONObject.toBean(src, RunningState.class);
+			RunningState res = JsonPluginsUtil.jsonToBean(srcList.get(0), RunningState.class);
 			return res;
 		} catch (JedisConnectionException e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
@@ -66,7 +65,7 @@ public class RunningStatusRedisImpl implements IRunningStatusCacheManager {
 		ShardedJedis shardedJedis = null;
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
-			shardedJedis.rpush(key, JSONObject.fromObject(s).toString()).intValue();
+			shardedJedis.rpush(key, JsonPluginsUtil.beanToJson(s)).intValue();
 		} catch (JedisConnectionException e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 			shardedJedis = null;

@@ -11,6 +11,7 @@ import cn.com.tf.cache.ITmnlVehiCacheManager;
 import cn.com.tf.cache.IVehicleCacheManager;
 import cn.com.tf.handler.DownDataHandler;
 import cn.com.tf.handler.GpsHandler;
+import cn.com.tf.handler.RunningStatusHandler;
 import cn.com.tf.handler.UpDataHandler;
 
 /**
@@ -30,7 +31,7 @@ public class ServerLister implements ServletContextListener {
 		//初始化缓存数据
 		initCache();
 		//启动业务服务
-		startBusi();
+		startBusiHandler();
 		// 启动MINA服务
 		minaServer = (MinaServer) app.getBean("minaServer");
 		minaServer.startServer();
@@ -59,17 +60,20 @@ public class ServerLister implements ServletContextListener {
 	/**
 	 *启动业务处理服务
 	 */
-	private void startBusi(){
+	private void startBusiHandler(){
 		//上行处理器
 		UpDataHandler upDataHandler = (UpDataHandler) app.getBean("upDataHandler");
 		//下行处理器
 		DownDataHandler downDataHandler = (DownDataHandler) app.getBean("downDataHandler");
 		//GPS处理器'
 		GpsHandler gpsHandler = (GpsHandler) app.getBean("gpsHandler");
-		//TODO:启动上行、下行消息处理器 
+		//车辆运行状态处理器
+		RunningStatusHandler runningStatusHandler = (RunningStatusHandler) app.getBean("runningStatusHandler");
+		//启动处理器 
 		upDataHandler.startHandler();
 		downDataHandler.startHandler();
 		gpsHandler.startHandler();
+		runningStatusHandler.startHandler();
 	}
 
 }

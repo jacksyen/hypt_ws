@@ -30,6 +30,8 @@ public class RunningState {
 	private String status;// 状态
 	private Date receivedTime;
 	
+	public RunningState(){}
+	
 	public RunningState(GpsInfo g){
 		this.alarmStatus = g.getAlarmStatus();
 		this.altitude = g.getAltitude();
@@ -46,6 +48,7 @@ public class RunningState {
 		this.runStatus = g.getRunStatus();
 		this.simNo = g.getSimNo();
 		this.tid = g.getTid();
+		this.vid = g.getVid();
 	}
 
 	public Date getReceivedTime() {
