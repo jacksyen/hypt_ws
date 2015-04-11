@@ -37,7 +37,7 @@
 		</property>
 		<!-- cron表达式 -->
 		<property name="cronExpression">
-			<value>0 26 18 * * ?</value>
+			<value>0 05 0 * * ?</value>
 		</property>
 	</bean>
 	<!-- 生成轨迹任务 -->
@@ -58,7 +58,7 @@
 		</property>
 		<!-- cron表达式 -->
 		<property name="cronExpression">
-			<value>0 26 18 * * ?</value>
+			<value>0 15 0 * * ?</value>
 		</property>
 	</bean>
 	<!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 -->
