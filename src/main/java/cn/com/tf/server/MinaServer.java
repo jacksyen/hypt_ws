@@ -54,7 +54,7 @@ public class MinaServer {
 					KeepAliveMessageFactory heartBeatFactory = new KeepAliveMessageFactoryImpl();
 					KeepAliveFilter heartBeat = new KeepAliveFilter(heartBeatFactory,IdleStatus.BOTH_IDLE);
 					heartBeat.setForwardEvent(true);
-					heartBeat.setRequestInterval(30);//心跳5分钟超时
+					heartBeat.setRequestInterval(5*60);//心跳5分钟超时
 					acceptor.getFilterChain().addLast("heartbeat", heartBeat);
 					//绑定业务处理器
 					acceptor.setHandler(serverHandler);
