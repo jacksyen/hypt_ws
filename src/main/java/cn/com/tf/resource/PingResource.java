@@ -1,22 +1,30 @@
 package cn.com.tf.resource;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import net.sf.json.JSONObject;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@Component
-@Path("test")
+@Controller
+@RequestMapping("test")
 public class PingResource {
 	
-	@GET
-	@Path("t")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	@RequestMapping(value="/welcome",method=RequestMethod.GET)
 	public String test(){
 		System.out.println("hello!");
-		return "js.p";
+		return "index";
+	}
+	
+	@RequestMapping(value="/json",method=RequestMethod.POST ,consumes="application/json")
+	public @ResponseBody String json(@RequestBody JSONObject jj){
+		System.out.println(jj.toString());
+		JSONObject json = new JSONObject();
+		json.put("name", "tianfei");
+		
+		return json.toString();
 	}
 
 }
