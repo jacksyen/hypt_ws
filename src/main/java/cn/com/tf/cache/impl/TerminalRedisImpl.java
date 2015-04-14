@@ -39,7 +39,7 @@ public class TerminalRedisImpl implements ITerminalCacheManager {
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			String status = shardedJedis.get(TERMINAL_CACHE_STATUS);
-			if (StringUtils.isBlank(status) || status.equals("0")) {
+//			if (StringUtils.isBlank(status) || status.equals("0")) {
 				// 查询终端信息
 				TerminalExample example = new TerminalExample();
 				example.or().andWorkingStatusEqualTo(1);	//设备工作状态
@@ -53,7 +53,7 @@ public class TerminalRedisImpl implements ITerminalCacheManager {
 				shardedJedis.set(TERMINAL_CACHE_STATUS, "1");
 				LOGGER.info("Terminal缓存初始化执行完成,共初始化" + terminals.size()
 						+ "个终端信息到缓存中!");
-			}
+//			}
 		} catch (Exception e) {
 			LOGGER.error("Terminal缓存初始化错误", e);
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);

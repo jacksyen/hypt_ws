@@ -36,7 +36,7 @@ public class TmnlVehiRedisImpl implements ITmnlVehiCacheManager {
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			String status = shardedJedis.get(TVR_CACHE_STATUS);
-			if (StringUtils.isBlank(status) || status.equals("0")) {
+//			if (StringUtils.isBlank(status) || status.equals("0")) {
 				//查询车辆与终端绑定关系
 				TerminalVehicleExample example = new TerminalVehicleExample();
 				List<TerminalVehicle> relations = terminalVehicleMapper.selectByExample(example);
@@ -52,7 +52,7 @@ public class TmnlVehiRedisImpl implements ITmnlVehiCacheManager {
 				LOGGER.info("TerminalVehicleRelation缓存初始化执行完成,共初始化"
 						+ relations.size() + "个终端车辆绑定信息到缓存中!");
 
-			}
+//			}
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 		} finally {

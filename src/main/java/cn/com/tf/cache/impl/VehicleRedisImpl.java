@@ -37,7 +37,7 @@ public class VehicleRedisImpl implements IVehicleCacheManager {
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			String status = shardedJedis.get(VEHICLE_CACHE_STATUS);
-			if (StringUtils.isBlank(status) || status.equals("0")) {
+//			if (StringUtils.isBlank(status) || status.equals("0")) {
 				// 车辆信息
 				VehicleExample example = new VehicleExample();
 				example.or().andStatusEqualTo((byte) 1);			//正常车辆
@@ -50,7 +50,7 @@ public class VehicleRedisImpl implements IVehicleCacheManager {
 				shardedJedis.set(VEHICLE_CACHE_STATUS, "1");
 				LOGGER.info("Vehicle缓存初始化执行完成,共初始化" + vehicles.size()
 						+ "个车辆信息到缓存中!");
-			}
+//			}
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 			LOGGER.error("初始化车辆缓存失败",e);
