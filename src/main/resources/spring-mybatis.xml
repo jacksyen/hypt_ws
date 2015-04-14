@@ -7,7 +7,7 @@
     http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd  ">
 	<!-- 引入属性文件 -->
-	<context:property-placeholder location="classpath:jdbc.properties" />
+	<context:property-placeholder location="file:${configpath}/hypt/jdbc.properties" />
 
 	<!-- 配置数据源 -->
 	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
