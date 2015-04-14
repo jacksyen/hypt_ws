@@ -14,7 +14,7 @@ public class PingResource {
 	
 	@RequestMapping(value="/welcome",method=RequestMethod.GET)
 	public String test(){
-		System.out.println("hello!");
+		System.out.println("hello!田百态");
 		return "index";
 	}
 	
