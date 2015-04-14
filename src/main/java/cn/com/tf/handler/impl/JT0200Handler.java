@@ -60,13 +60,13 @@ public class JT0200Handler extends IJt808Handler {
 			Logger.info(String.format("经纬度值为零,直接丢弃该位置数据包 :发送时间:%s", DateUtil.TIMEFORMATER1().format(dt)));
 			return;
 		}
-		//设置车辆行驶状态
 		Terminal tmnl = terminalCacheManager.getTerminalBySimNo(msg.getSimNo());
 		TerminalVehicle tv = tmnlVehicleCacheManager.findCurBindRelationsByTerminalId(tmnl.getTerminalId());
 		Vehicle vehicle = null;
 		if(tv != null){
 			vehicle = vehicleCacheManager.findVehicleById(tv.getVehicleId());
 			if(vehicle != null){
+				//设置车辆行驶状态
 				gi.setVid(vehicle.getVehicleId());
 				if(body.getSpeed() > 1){
 					dataAcquireCacheManager.setRunningStatus(vehicle.getVehicleId(), JT808Constants.VEHICLE_RUNNING_STATUS_RUNNING);
@@ -101,14 +101,8 @@ public class JT0200Handler extends IJt808Handler {
 		gi.setStatus(body.getStatus());
 		//位置信息处理
 		gpsHandler.addGps(gi);
+		//车辆运行状态处理
 		runningStatusHandler.processData(gi);
 		//TODO:待处理告警
-		
-		//回复消息
-		JT8001 rbody = new JT8001(msg.getHead().getFlowNo(), msg.getHead().getMessageId(), EMsgAck.SUCESS.value());
-		Jt808MessageHead head = msg.getHead();
-		head.setMessageId(0x8001);
-		Jt808Message response = new Jt808Message(head,rbody);
-		writeResponse(response);
 	}
 }

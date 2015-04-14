@@ -1,17 +1,24 @@
 package cn.com.tf.handler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import cn.com.hypt.db.model.Terminal;
 import cn.com.tf.cache.ITerminalCacheManager;
+import cn.com.tf.protocol.EMsgAck;
 import cn.com.tf.protocol.Jt808Message;
+import cn.com.tf.protocol.Jt808MessageHead;
+import cn.com.tf.protocol.impl.JT8001;
 
 /**
  * 上行数据包处理器
@@ -32,6 +39,11 @@ public class UpDataHandler {
 	private volatile boolean startFlag = false;
 	
 	private Map<String, IJt808Handler> codeHandler = new HashMap<String, IJt808Handler>();
+	
+	/**
+	 * 立即响应列表
+	 */
+	private List<String> platformCommReponse = new ArrayList<String>();
 	
 	@Autowired
 	private ITerminalCacheManager terminalCacheManager;
@@ -101,15 +113,31 @@ public class UpDataHandler {
 			}
 			//调用 消息处理器
 			IJt808Handler h =  codeHandler.get(msg.getMessageID());
-			if(h != null){
-				h.handle(msg);
-			} else {
-				logger.info("没有相应的处理器！"+msg.getMessageID());
+			if(h == null){
+				logger.info("没有相应的处理器或平台不需要处理，消息ID:"+msg.getMessageID());
+				return;
 			}
+			//平台通用响应
+			if(platformCommReponse.contains(msg.getMessageID())){
+				//回复消息
+				JT8001 rbody = new JT8001(msg.getHead().getFlowNo(), msg.getHead().getMessageId(), EMsgAck.SUCESS.value());
+				Jt808MessageHead head = msg.getHead();
+				head.setMessageId(0x8001);
+				Jt808Message response = new Jt808Message(head,rbody);
+				h.writeResponse(response);
+				
+				return;
+			}
+			//消息处理器调用
+			h.handle(msg);
 		}
 	}
 
 	public void setCodeHandler(Map<String, IJt808Handler> codeHandler) {
 		this.codeHandler = codeHandler;
+	}
+
+	public void setPlatformCommReponse(List<String> platformCommReponse) {
+		this.platformCommReponse = platformCommReponse;
 	}
 }

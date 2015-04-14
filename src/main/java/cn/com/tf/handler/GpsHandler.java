@@ -97,7 +97,7 @@ public class GpsHandler {
 
 		@Override
 		public void run() {
-			// TODO:位置偏转
+			// 位置偏转
 			JSONObject json = LocationTool.deflectGpsData(gpsInfo);
 			if(json == null){
 				//位置偏转失败 TODO:T待优化处理

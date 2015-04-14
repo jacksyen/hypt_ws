@@ -54,12 +54,10 @@ public class RunningStatusHandler {
 				startFlag = true;
 				Thread thread = new Thread(new Runnable() {
 					public void run() {
-						logger.info("启动上行数据处理器成功！");
+						logger.info("启动车辆运行状态处理器成功！");
 						while (true) {
 							try {
-								executorService
-										.execute(new RunningStatusThread(
-												gpsQueue.take())); // 阻塞方法
+								executorService.execute(new RunningStatusThread(gpsQueue.take())); // 阻塞方法
 								Thread.sleep(300);
 							} catch (InterruptedException e) {
 								Thread.currentThread().interrupt();
@@ -98,15 +96,14 @@ public class RunningStatusHandler {
 		public void run() {
 			// 最近一条车辆状态
 			RunningState lastrs = runningStatusCacheManager.findLatestRunningState(gpsInfo.getVid(),new Date());
-//			if (null != lastrs) {
-//				long preTime = lastrs.getReceivedTime().getTime();
-//				long nowTime = gpsInfo.getSendTime().getTime();
-//
-//				if ((nowTime - preTime) < 0
-//						|| ((nowTime - preTime) / 60000) < 4) {
-//					return;
-//				}
-//			}
+			if (null != lastrs) {
+				long preTime = lastrs.getReceivedTime().getTime();
+				long nowTime = gpsInfo.getSendTime().getTime();
+				//5分钟内的状态不更新
+				if ((nowTime - preTime) < 0 || ((nowTime - preTime) / 60000) < 4) {
+					return;
+				}
+			}
 			// 当前车辆状态
 			RunningState curr = new RunningState(gpsInfo);
 			// 保存当前车辆状态
@@ -129,10 +126,9 @@ public class RunningStatusHandler {
 			double curMileage = curState.getMileage();
 			double prevMileage = prevState.getMileage();
 			double refuelAmount = curFuelAmount - prevFuelAmount;
-			if ((refuelAmount >= 5)
-					&& ((curMileage - prevMileage <= 10) || (curState
-							.getReceivedTime().getTime()
-							- prevState.getReceivedTime().getTime() <= 15 * 60 * 1000))) {
+			//加油量> 15 &&  距离 《＝10 || 时间 <15小时
+			if ((refuelAmount >= 15) && ((curMileage - prevMileage <= 10) ||
+					(curState.getReceivedTime().getTime() - prevState.getReceivedTime().getTime() <= 15 * 60 * 1000))) {
 				Refuel refuel = new Refuel();
 				refuel.setFuelAmount(new BigDecimal(refuelAmount));
 				refuel.setRefuelDate(curState.getReceivedTime());

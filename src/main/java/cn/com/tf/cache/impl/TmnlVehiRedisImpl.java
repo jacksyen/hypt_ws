@@ -37,18 +37,15 @@ public class TmnlVehiRedisImpl implements ITmnlVehiCacheManager {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			String status = shardedJedis.get(TVR_CACHE_STATUS);
 			if (StringUtils.isBlank(status) || status.equals("0")) {
+				//查询车辆与终端绑定关系
 				TerminalVehicleExample example = new TerminalVehicleExample();
 				List<TerminalVehicle> relations = terminalVehicleMapper.selectByExample(example);
 				for (TerminalVehicle r : relations) {
 					JSONObject jsonObj = JSONObject.fromObject(r);
-					shardedJedis.set(
-							TVR_TID_RELATION_CACHE_PREFIX + r.getTerminalId(),
+					shardedJedis.set(TVR_TID_RELATION_CACHE_PREFIX + r.getTerminalId(),
 							jsonObj.toString());
-					shardedJedis.set(
-							TVR_VID_TID_CACHE_PREFIX + r.getVehicleId(),
+					shardedJedis.set(TVR_VID_TID_CACHE_PREFIX + r.getVehicleId(),
 							String.valueOf(r.getTerminalId()));
-					// JT808CacheManagerFactory.getDataAcquireCacheManager()
-					// .setBindTime(r.getTerminalId(), r.getCreated());
 				}
 
 				shardedJedis.set(TVR_CACHE_STATUS, "1");

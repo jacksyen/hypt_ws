@@ -42,22 +42,14 @@ public class TerminalRedisImpl implements ITerminalCacheManager {
 			if (StringUtils.isBlank(status) || status.equals("0")) {
 				// 查询终端信息
 				TerminalExample example = new TerminalExample();
-				example.or().andSimStatusEqualTo(0);
-				List<Terminal> terminals = terminalMapper
-						.selectByExample(example);
+				example.or().andWorkingStatusEqualTo(1);	//设备工作状态
+				List<Terminal> terminals = terminalMapper.selectByExample(example);
 				for (Terminal t : terminals) {
 					JSONObject jsonObj = JSONObject.fromObject(t);
-					shardedJedis.set(
-							TERMINAL_IMEI_TERMINAL_CACHE_PREFIX + t.getImei(),
-							jsonObj.toString());
-					shardedJedis.set(
-							TERMINAL_SIMNO_TERMINAL_CACHE_PREFIX + t.getImsi(),
-							jsonObj.toString());
-					shardedJedis.set(
-							TERMINAL_TID_IMEI_CACHE_PREFIX + t.getTerminalId(),
-							t.getImei());
+					shardedJedis.set(TERMINAL_IMEI_TERMINAL_CACHE_PREFIX + t.getImei(),jsonObj.toString());
+					shardedJedis.set(TERMINAL_SIMNO_TERMINAL_CACHE_PREFIX + t.getImsi(),jsonObj.toString());
+					shardedJedis.set(TERMINAL_TID_IMEI_CACHE_PREFIX + t.getTerminalId(), t.getImei());
 				}
-
 				shardedJedis.set(TERMINAL_CACHE_STATUS, "1");
 				LOGGER.info("Terminal缓存初始化执行完成,共初始化" + terminals.size()
 						+ "个终端信息到缓存中!");
@@ -115,34 +107,31 @@ public class TerminalRedisImpl implements ITerminalCacheManager {
 
 	@Override
 	public Terminal addOrUpdateTerminal(Terminal t) {
-		if (StringUtils.isEmpty(t.getImei())) {
+		if (t == null || StringUtils.isEmpty(t.getImei())) {
 			return null;
 		}
-
 		if (t.getTerminalId() == null) {
-			//
+			// 保存终端信息
 			TerminalExample baseExample = new TerminalExample();
 			baseExample.createCriteria().andImeiEqualTo(t.getImei());
 			List<Terminal> tList = terminalMapper.selectByExample(baseExample);
 			if (tList == null || tList.size() == 0) {
 				terminalMapper.insertSelective(t);
+			} else {
+				//终端已经存在
+				return null;
 			}
 		} else {
 			terminalMapper.updateByPrimaryKeySelective(t);
 		}
-
+		
 		ShardedJedis shardedJedis = null;
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
-
 			JSONObject jsonObj = JSONObject.fromObject(t);
-			shardedJedis.set(TERMINAL_IMEI_TERMINAL_CACHE_PREFIX + t.getImei(),
-					jsonObj.toString());
-			shardedJedis.set(
-					TERMINAL_SIMNO_TERMINAL_CACHE_PREFIX + t.getImsi(),
-					jsonObj.toString());
-			shardedJedis.set(TERMINAL_TID_IMEI_CACHE_PREFIX + t.getTerminalId(),
-					t.getImei());
+			shardedJedis.set(TERMINAL_IMEI_TERMINAL_CACHE_PREFIX + t.getImei(), jsonObj.toString());
+			shardedJedis.set( TERMINAL_SIMNO_TERMINAL_CACHE_PREFIX + t.getImsi(), jsonObj.toString());
+			shardedJedis.set(TERMINAL_TID_IMEI_CACHE_PREFIX + t.getTerminalId(), t.getImei());
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 		} finally {

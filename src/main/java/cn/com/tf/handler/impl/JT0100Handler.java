@@ -72,6 +72,7 @@ public class JT0100Handler extends IJt808Handler {
 						//保存终端绑定
 						tmnl.setBindTime(new Date());
 						terminalCacheManager.addOrUpdateTerminal(tmnl);
+						logger.info(String.format("车辆与终端绑定成功，终端IMEI：%s,车牌：%s，SIM：%s",tmnl.getImei(),vehicle.getLicensePlate(),simNo));
 					}
 				} else {
 					logger.info("终端注册失败，车辆不存在："+body.getLicensePlate());

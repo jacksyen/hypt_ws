@@ -54,7 +54,7 @@ public class MinaServer {
 					KeepAliveMessageFactory heartBeatFactory = new KeepAliveMessageFactoryImpl();
 					KeepAliveFilter heartBeat = new KeepAliveFilter(heartBeatFactory,IdleStatus.BOTH_IDLE);
 					heartBeat.setForwardEvent(true);
-					heartBeat.setRequestInterval(5*60);//心跳5分钟超时
+					heartBeat.setRequestInterval(15 * 60);//心跳15分钟超时
 					acceptor.getFilterChain().addLast("heartbeat", heartBeat);
 					//绑定业务处理器
 					acceptor.setHandler(serverHandler);
@@ -87,7 +87,7 @@ public class MinaServer {
 	 * @author tianfei
 	 *
 	 */
-	private static class KeepAliveMessageFactoryImpl implements KeepAliveMessageFactory{
+	private class KeepAliveMessageFactoryImpl implements KeepAliveMessageFactory{
 		@Override
 		public boolean isRequest(IoSession session, Object message) {
 			if(message instanceof Jt808Message){
@@ -109,6 +109,7 @@ public class MinaServer {
 		@Override
 		public Object getRequest(IoSession session) {
 			//心跳超时，断开连接 
+			logger.info(String.format("终端与平台超时断开连接，SIM：%s"), serverHandler.getSimNo(session));
 			session.close(true);
 			return null;
 		}

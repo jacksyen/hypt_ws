@@ -65,7 +65,7 @@ public class RunningStatusRedisImpl implements IRunningStatusCacheManager {
 		ShardedJedis shardedJedis = null;
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
-			shardedJedis.rpush(key, JsonPluginsUtil.beanToJson(s)).intValue();
+			shardedJedis.rpush(key, JsonPluginsUtil.beanToJson(s));
 		} catch (JedisConnectionException e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 			shardedJedis = null;

@@ -18,6 +18,12 @@
 				<entry key="0200" value-ref="jt0200Handler"></entry>
 			</map>
 		</property>
+		<!-- 平台通用响应消息ID集合 -->
+		<property name="platformCommReponse">
+			<list>
+				<value type="java.lang.String">0200</value>
+			</list>
+		</property>
 	</bean>
 
 	<!-- 定时器 -->

@@ -40,16 +40,12 @@ public class VehicleRedisImpl implements IVehicleCacheManager {
 			if (StringUtils.isBlank(status) || status.equals("0")) {
 				// 车辆信息
 				VehicleExample example = new VehicleExample();
-				example.or().andStatusEqualTo((byte) 0);
+				example.or().andStatusEqualTo((byte) 1);			//正常车辆
 				List<Vehicle> vehicles = vehicleMapper.selectByExample(example);
 				for (Vehicle v : vehicles) {
 					JSONObject jsonObj = JSONObject.fromObject(v);
-					shardedJedis
-							.set(VEHICLE_VID_VEHICLE_CACHE_PREFIX
-									+ v.getVehicleId(), jsonObj.toString());
-					shardedJedis.set(
-							VEHICLE_LICENSE_PLATE_CACHE_PREFIX
-									+ v.getLicensePlate(), jsonObj.toString());
+					shardedJedis.set(VEHICLE_VID_VEHICLE_CACHE_PREFIX + v.getVehicleId(), jsonObj.toString());
+					shardedJedis.set(VEHICLE_LICENSE_PLATE_CACHE_PREFIX + v.getLicensePlate(), jsonObj.toString());
 				}
 				shardedJedis.set(VEHICLE_CACHE_STATUS, "1");
 				LOGGER.info("Vehicle缓存初始化执行完成,共初始化" + vehicles.size()
@@ -105,9 +101,8 @@ public class VehicleRedisImpl implements IVehicleCacheManager {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 
 			JSONObject jsonObj = JSONObject.fromObject(v);
-			shardedJedis.set(
-					VEHICLE_VID_VEHICLE_CACHE_PREFIX + v.getVehicleId(),
-					jsonObj.toString());
+			shardedJedis.set(VEHICLE_VID_VEHICLE_CACHE_PREFIX + v.getVehicleId(),jsonObj.toString());
+			shardedJedis.set(VEHICLE_LICENSE_PLATE_CACHE_PREFIX + v.getLicensePlate(), jsonObj.toString());
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 		} finally {

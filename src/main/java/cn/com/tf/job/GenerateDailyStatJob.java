@@ -118,15 +118,10 @@ public class GenerateDailyStatJob {
 		double[] calcData = null;
 		List<RunningState> runningStates = null;
 		normalQueryStart = System.currentTimeMillis();
-		runningStates = runningStatusCacheManager.findRunningStates(vehicleId,
-				date);
-
+		runningStates = runningStatusCacheManager.findRunningStates(vehicleId,date);
 		if (runningStates != null && runningStates.size() > 0) {
-
-			logger.debug("计算当日行驶里程和油耗Start，runningStates长度："
-					+ runningStates.size());
+			logger.debug("计算当日行驶里程和油耗Start，runningStates长度："+ runningStates.size());
 			normalQueryStart = System.currentTimeMillis();
-
 			// 计算当天油耗
 			double firstFuel = 0;
 			for (int i = 0; i < runningStates.size(); i++) {
@@ -147,7 +142,6 @@ public class GenerateDailyStatJob {
 			if (fuelIncountTemp < 0) {
 				fuelIncountTemp = 0;
 			}
-
 			// 计算当天行驶里程
 			double firstMileage = 0;
 			for (int i = 0; i < runningStates.size(); i++) {
@@ -156,7 +150,6 @@ public class GenerateDailyStatJob {
 					break;
 				}
 			}
-
 			double lastMileage = 0;
 			for (int i = runningStates.size() - 1; i >= 0; i--) {
 				if (runningStates.get(i).getMileage() > 0) {
@@ -164,26 +157,22 @@ public class GenerateDailyStatJob {
 					break;
 				}
 			}
-
 			double mileageIncountTemp = lastMileage - firstMileage;
 
-			if (mileageIncountTemp > MAX_MILEAGE_INCOUNT
-					|| mileageIncountTemp < 0) {
+			if (mileageIncountTemp > MAX_MILEAGE_INCOUNT || mileageIncountTemp < 0) {
 				mileageIncountTemp = calcMileage(runningStates);
 			}
 
 			calcData = new double[2];
-			calcData[0] = fuelIncountTemp;
-			calcData[1] = mileageIncountTemp;
+			calcData[0] = fuelIncountTemp;	//耗油量
+			calcData[1] = mileageIncountTemp;	//行驶里程
 
 			normalQueryEnd = System.currentTimeMillis();
-			logger.debug("计算当日行驶里程和油耗End，共耗时"
-					+ (normalQueryEnd - normalQueryStart) + "ms");
+			logger.debug("计算当日行驶里程和油耗End，共耗时" + (normalQueryEnd - normalQueryStart) + "ms");
 		}
 
 		programEnd = System.currentTimeMillis();
-		logger.debug("计算或获取日统计信息时计算行驶里程和油耗End，共耗时"
-				+ (programEnd - programStart) + "ms");
+		logger.debug("计算或获取日统计信息时计算行驶里程和油耗End，共耗时" + (programEnd - programStart) + "ms");
 		return calcData;
 	}
 
@@ -219,8 +208,7 @@ public class GenerateDailyStatJob {
 			}
 		}
 
-		mileageIncount += list.get(end).doubleValue()
-				- list.get(start + 1).doubleValue();
+		mileageIncount += list.get(end).doubleValue() - list.get(start + 1).doubleValue();
 
 		return mileageIncount;
 	}
@@ -237,7 +225,7 @@ public class GenerateDailyStatJob {
 		calendar.set(Calendar.SECOND, 59);
 		calendar.set(Calendar.MINUTE, 59);
 		Date end = calendar.getTime();
-		//
+		// 查询某一天的加油量
 		RefuelExample example = new RefuelExample();
 		example.or().andRefuelDateGreaterThanOrEqualTo(start).andRefuelDateLessThanOrEqualTo(end).andVehicleIdEqualTo(vehicleId);
 		List<Refuel> list = refuelMapper.selectByExample(example);

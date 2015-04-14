@@ -135,7 +135,7 @@ public class ServerHandler extends IoHandlerAdapter {
 	 * @param session
 	 * @return
 	 */
-	private String getSimNo(IoSession session) {
+	public String getSimNo(IoSession session) {
 		return "" + session.getAttribute("simNo");
 	}
 

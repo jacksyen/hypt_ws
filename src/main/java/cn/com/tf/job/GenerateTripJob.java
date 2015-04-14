@@ -67,8 +67,7 @@ public class GenerateTripJob {
 		}
 
 		if (StringUtils.isBlank(strTrip)) {
-			logger.info(String.format("redis中没有相应的轨迹数据: vid=%d，recvDay=%d",
-					vehicleId, occurDay));
+			logger.info(String.format("redis中没有相应的轨迹数据: vid=%d，recvDay=%d", vehicleId, occurDay));
 			return;
 		}
 

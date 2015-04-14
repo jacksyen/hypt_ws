@@ -4,9 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import cn.com.tf.cache.ITripCacheManager;
-import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.ShardedJedisPoolFactory;
 import redis.clients.jedis.ShardedJedis;
 import net.sf.json.JSONObject;
@@ -33,19 +31,13 @@ public class TripRedisImpl implements ITripCacheManager {
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			shardedJedis.append(key, record.toString() + ",");
-			String temp = shardedJedis.get(GPS_TRIP_TERMINAL_PREFIX
-					+ gpsInfo.optInt("vid"));
-			if (StringUtils.isNotBlank(temp)
-					&& !temp.equals(String.valueOf(gpsInfo.optInt("tid")))) {
+			String temp = shardedJedis.get(GPS_TRIP_TERMINAL_PREFIX + gpsInfo.optInt("vid"));
+			if (StringUtils.isNotBlank(temp) && !temp.equals(String.valueOf(gpsInfo.optInt("tid")))) {
 				logger.warn(String.format("车辆[%d]对应的终端编号发生变化：[%s]->[%s]",
 						gpsInfo.optInt("vid"), temp, gpsInfo.optInt("tid")));
-				shardedJedis.set(
-						GPS_TRIP_TERMINAL_PREFIX + gpsInfo.optInt("vid"),
-						String.valueOf(gpsInfo.optInt("tid")));
+				shardedJedis.set(GPS_TRIP_TERMINAL_PREFIX + gpsInfo.optInt("vid"),String.valueOf(gpsInfo.optInt("tid")));
 			} else if (StringUtils.isBlank(temp)) {
-				shardedJedis.set(
-						GPS_TRIP_TERMINAL_PREFIX + gpsInfo.optInt("vid"),
-						String.valueOf(gpsInfo.optInt("tid")));
+				shardedJedis.set(GPS_TRIP_TERMINAL_PREFIX + gpsInfo.optInt("vid"),String.valueOf(gpsInfo.optInt("tid")));
 			}
 
 		} catch (Exception e) {
@@ -68,13 +60,10 @@ public class TripRedisImpl implements ITripCacheManager {
 		try {
 			shardedJedis = ShardedJedisPoolFactory.getResource();
 			trip = shardedJedis.get(key);
-
-			String strTid = shardedJedis.get(GPS_TRIP_TERMINAL_PREFIX
-					+ vehicleId);
+			String strTid = shardedJedis.get(GPS_TRIP_TERMINAL_PREFIX + vehicleId);
 			if (StringUtils.isNotBlank(strTid)) {
 				tid = Integer.parseInt(strTid);
 			}
-
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
 			String errorMsg = String.format("获取车辆[%d]的轨迹数据失败,失败原因：%s",
