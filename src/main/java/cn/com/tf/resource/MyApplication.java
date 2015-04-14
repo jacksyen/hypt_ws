@@ -1,11 +1,7 @@
 package cn.com.tf.resource;
 
-import org.glassfish.jersey.server.ResourceConfig;
 
-public class MyApplication extends ResourceConfig  {
+public class MyApplication   {
 	
-	public MyApplication() {
-		register(PingResource.class);
-	}
 
 }

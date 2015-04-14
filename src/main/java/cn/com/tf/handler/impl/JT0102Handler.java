@@ -3,7 +3,6 @@ package cn.com.tf.handler.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import cn.com.tf.handler.IJt808Handler;
 import cn.com.tf.protocol.EMsgAck;
 import cn.com.tf.protocol.Jt808Message;
@@ -20,7 +19,7 @@ import cn.com.tf.tool.JT808Constants;
 @Component("jt0102Handler")
 public class JT0102Handler extends IJt808Handler {
 	private static Logger logger = LoggerFactory.getLogger(JT0102Handler.class);
-
+	
 	@Override
 	public void handle(Jt808Message msg) {
 		JT0102 body = (JT0102) msg.getBody();

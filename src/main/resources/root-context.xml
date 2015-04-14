@@ -8,7 +8,6 @@
 	<context:component-scan base-package="cn.com.tf" />
 	
 	<import resource="spring-mybatis.xml" />
-	<import resource="springMVC-servlet.xml" />
 
 	<!-- 上行处理器 -->
 	<bean id="upDataHandler" class="cn.com.tf.handler.UpDataHandler">

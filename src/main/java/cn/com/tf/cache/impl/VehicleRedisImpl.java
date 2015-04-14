@@ -57,6 +57,7 @@ public class VehicleRedisImpl implements IVehicleCacheManager {
 			}
 		} catch (Exception e) {
 			ShardedJedisPoolFactory.returnBrokenResource(shardedJedis);
+			LOGGER.error("初始化车辆缓存失败",e);
 		} finally {
 			ShardedJedisPoolFactory.returnResource(shardedJedis);
 		}
