@@ -1,7 +1,9 @@
 package cn.com.tf.resource;
 
 import java.util.Date;
+
 import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.cache.IRunningStatusCacheManager;
+import cn.com.tf.cache.ITerminalCacheManager;
+import cn.com.tf.cache.ITmnlVehiCacheManager;
 import cn.com.tf.cache.ITripCacheManager;
+import cn.com.tf.cache.IVehicleCacheManager;
 import cn.com.tf.job.GenerateDailyStatJob;
 import cn.com.tf.job.GenerateTripJob;
 import cn.com.tf.model.RunningState;
@@ -41,6 +46,15 @@ public class VehicleStausResource {
 	@Autowired
 	private GenerateTripJob generateTripJob;
 	
+	@Autowired
+	private ITerminalCacheManager terminalCacheManager;
+	
+	@Autowired
+	private IVehicleCacheManager vehicleCacheManager;
+	
+	@Autowired
+	private ITmnlVehiCacheManager tmnlVehCacheManager;
+	
 	@RequestMapping
 	public @ResponseBody String desc(){
 		JSONObject json = new JSONObject();
@@ -61,7 +75,10 @@ public class VehicleStausResource {
 	@RequestMapping(value = "gps",method=RequestMethod.GET)
 	public @ResponseBody String getVehicleGps(@RequestParam("vid")int vehicleId){
 		JSONObject json = dataAcquireCacheManager.getGps(vehicleId);
-		return json.toString();
+		if(json != null){
+			return json.toString();
+		}
+		return "没有GPS";
 	}
 	
 	/**
@@ -73,7 +90,10 @@ public class VehicleStausResource {
 	public @ResponseBody String getRunningSatus(@RequestParam("vid")int vehicleId) { 
 		Date occurTime = DateUtil.addDate(DateUtil.formatDate(new Date()), 0);
 		RunningState rs = runningStatusCacheManager.findLatestRunningState(vehicleId, occurTime);
-		return JSONObject.fromObject(rs).toString();
+		if(rs != null){
+			return JSONObject.fromObject(rs).toString();
+		}
+		return "没有车辆运行状态";
 	}
 	
 	/**
@@ -86,8 +106,10 @@ public class VehicleStausResource {
 		Date occurTime = DateUtil.addDate(DateUtil.formatDate(new Date()), 0);
 		int occurDay = Integer.parseInt(DateUtil.DATEFORMATER().format(occurTime));
 		JSONObject json = tripCacheManager.getGpsTrip(vehicleId, occurDay);
-		
-		return json.toString();
+		if(json != null){
+			return json.toString();
+		}
+		return "没有轨迹点";
 	}
 	
 	/**
@@ -107,6 +129,19 @@ public class VehicleStausResource {
 	@RequestMapping(value="tripJob",method=RequestMethod.GET)
 	public @ResponseBody String generateTripJob(){
 		generateTripJob.execute();
+		
+		return "success";
+	}
+	
+	/**
+	 * 刷新缓存信息
+	 * @return
+	 */
+	@RequestMapping(value="refreshCache",method=RequestMethod.GET)
+	public @ResponseBody String refreshCache(){
+		terminalCacheManager.initCache();
+		vehicleCacheManager.initCache();
+		tmnlVehCacheManager.initCache();
 		
 		return "success";
 	}

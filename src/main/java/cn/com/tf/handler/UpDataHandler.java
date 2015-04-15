@@ -125,8 +125,6 @@ public class UpDataHandler {
 				head.setMessageId(0x8001);
 				Jt808Message response = new Jt808Message(head,rbody);
 				h.writeResponse(response);
-				
-				return;
 			}
 			//消息处理器调用
 			h.handle(msg);
