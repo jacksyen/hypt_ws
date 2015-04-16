@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>   
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>  
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>  
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -60,9 +63,9 @@ body {
 			type="button" value="停止动画" onclick="stopAnimation()" />
 	</div>
 
-	<script type="text/javascript"
-		src="http://webapi.amap.com/maps?v=1.3&key=d05cbaac9f35812b93de8ab502c65e35"></script>
-	<script type="text/javascript" src="/hypt/js/jquery-2.1.3.min.js"></script>
+	<c:set var="ctx" value="${pageContext.request.contextPath }"></c:set>
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=d05cbaac9f35812b93de8ab502c65e35"></script>
+	<script type="text/javascript" src="${ctx}/js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript">
 		//初始化地图对象，加载地图
 		var map = new AMap.Map("mapContainer", {
