@@ -65,7 +65,7 @@ public class VehicleStausResource {
 	@RequestMapping
 	public @ResponseBody String desc(){
 		JSONObject json = new JSONObject();
-		json.put("gps?vid", "车辆当前位置信息");
+		json.put("location?vid", "车辆当前位置信息");
 		json.put("rstatus?vid", "查询车辆当前运行状态");
 		json.put("trip?vid", "查询车辆当前轨迹点");
 		json.put("dailyJob", "生成日统计");
@@ -79,7 +79,7 @@ public class VehicleStausResource {
 	 * @param vehicleId
 	 * @return
 	 */
-	@RequestMapping(value = "gps",method=RequestMethod.GET)
+	@RequestMapping(value = "location",method=RequestMethod.GET)
 	public @ResponseBody String getVehicleGps(@RequestParam("vid")int vehicleId){
 		JSONObject json = dataAcquireCacheManager.getGps(vehicleId);
 		if(json != null){

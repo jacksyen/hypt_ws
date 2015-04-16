@@ -22,8 +22,8 @@ public class RunningState {
 	private int direction;// 方向,0～359，正北为0，顺时针
 	private String alarmStatus;// 报警位状态
 	private double mileage;// 里程
-	private double gas;// 油量
-	private double recordVelocity;// 行驶记录仪速度
+	private double fuel;// 油量
+	private double recordSpeed;// 行驶记录仪速度
 	private double altitude;// 海拔
 	private boolean valid;// GPS的定位状态，false代表没有定位,被屏蔽或找不到卫星
 	private String runStatus;// 车辆行驶状态: 停止,运行
@@ -37,14 +37,14 @@ public class RunningState {
 		this.altitude = g.getAltitude();
 		this.commandId = g.getCommandId();
 		this.direction = g.getDirection();
-		this.gas = g.getGas();
+		this.fuel = g.getFuel();
 		this.latitude = g.getLatitude();
 		this.location = g.getLocation();
 		this.longitude = g.getLongitude();
 		this.mileage = g.getMileage();
 		this.plateNo = g.getPlateNo();
 		this.receivedTime = g.getSendTime();
-		this.recordVelocity = g.getRecordVelocity();
+		this.recordSpeed = g.getRecordSpeed();
 		this.runStatus = g.getRunStatus();
 		this.simNo = g.getSimNo();
 		this.tid = g.getTid();
@@ -163,20 +163,20 @@ public class RunningState {
 		this.mileage = mileage;
 	}
 
-	public double getGas() {
-		return gas;
+	public double getFuel() {
+		return fuel;
 	}
 
-	public void setGas(double gas) {
-		this.gas = gas;
+	public void setFuel(double fuel) {
+		this.fuel = fuel;
 	}
 
-	public double getRecordVelocity() {
-		return recordVelocity;
+	public double getRecordSpeed() {
+		return recordSpeed;
 	}
 
-	public void setRecordVelocity(double recordVelocity) {
-		this.recordVelocity = recordVelocity;
+	public void setRecordSpeed(double recordSpeed) {
+		this.recordSpeed = recordSpeed;
 	}
 
 	public double getAltitude() {

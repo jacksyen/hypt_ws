@@ -16,13 +16,13 @@ public class GpsInfo {
 	private Date sendTime;// 发送时间
 	private double longitude;// 经度
 	private double latitude;// 纬度
-	private double velocity;// 速度
+	private double speed;// 速度
 	private String location;// 对经纬度的地理位置解析
 	private int direction;// 方向,0～359，正北为0，顺时针
 	private String alarmStatus;// 报警位状态
 	private double mileage;// 里程
-	private double gas;// 油量
-	private double recordVelocity;// 行驶记录仪速度
+	private double fuel;// 油量
+	private double recordSpeed;// 行驶记录仪速度
 	private double altitude;// 海拔
 	private boolean valid;// GPS的定位状态，false代表没有定位,被屏蔽或找不到卫星
 	private String runStatus;// 车辆行驶状态: 停止,运行
@@ -90,12 +90,12 @@ public class GpsInfo {
 		latitude = value;
 	}
 
-	public final double getVelocity() {
-		return velocity;
+	public double getSpeed() {
+		return speed;
 	}
 
-	public final void setVelocity(double value) {
-		velocity = value;
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 
 	public final String getLocation() {
@@ -138,20 +138,20 @@ public class GpsInfo {
 		mileage = value;
 	}
 
-	public final double getGas() {
-		return gas;
+	public double getFuel() {
+		return fuel;
 	}
 
-	public final void setGas(double value) {
-		gas = value;
+	public void setFuel(double fuel) {
+		this.fuel = fuel;
 	}
 
-	public final double getRecordVelocity() {
-		return recordVelocity;
+	public double getRecordSpeed() {
+		return recordSpeed;
 	}
 
-	public final void setRecordVelocity(double value) {
-		recordVelocity = value;
+	public void setRecordSpeed(double recordSpeed) {
+		this.recordSpeed = recordSpeed;
 	}
 
 	public double getAltitude() {

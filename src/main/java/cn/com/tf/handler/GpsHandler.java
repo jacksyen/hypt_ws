@@ -109,10 +109,10 @@ public class GpsHandler {
 			gpsData.put("latitude", json.get("latitude"));
 			gpsData.put("longitude", json.get("longitude"));
 			gpsData.put("mileage", String.valueOf(gpsInfo.getMileage()));
-			gpsData.put("gas", String.valueOf(gpsInfo.getGas()));
+			gpsData.put("fuel", String.valueOf(gpsInfo.getFuel()));
 			gpsData.put("altitude", String.valueOf(gpsInfo.getAltitude()));
-			gpsData.put("velocity", String.valueOf(gpsInfo.getVelocity()));
-			gpsData.put("recordVelocity", String.valueOf(gpsInfo.getRecordVelocity()));
+			gpsData.put("speed", String.valueOf(gpsInfo.getSpeed()));
+			gpsData.put("recordSpeed", String.valueOf(gpsInfo.getRecordSpeed()));
 			gpsData.put("vid", gpsInfo.getVid());
 			gpsData.put("tid", gpsInfo.getTid());
 			String sendTime = DateUtil.TIMEFORMATER1().format(gpsInfo.getSendTime());

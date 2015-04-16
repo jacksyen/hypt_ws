@@ -89,7 +89,7 @@ public class GenerateDailyStatJob {
 		}
 		DailyStat dailyStat = new DailyStat();
 		dailyStat.setOccurDate(occurDay);
-		dailyStat.setFuelAmount(BigDecimal.valueOf(stat.getGas()));			//当前油量
+		dailyStat.setFuelAmount(BigDecimal.valueOf(stat.getFuel()));			//当前油量
 		dailyStat.setMileage(BigDecimal.valueOf(stat.getMileage()));	//当前里程
 		dailyStat.setVehicleId(vehicleId);
 		dailyStat.setFuelIncount(fuelIncount.setScale(2, RoundingMode.HALF_UP));	//当日油耗量
@@ -125,15 +125,15 @@ public class GenerateDailyStatJob {
 			// 计算当天油耗
 			double firstFuel = 0;
 			for (int i = 0; i < runningStates.size(); i++) {
-				if (runningStates.get(i).getGas() > 0) {
-					firstFuel = runningStates.get(i).getGas();
+				if (runningStates.get(i).getFuel() > 0) {
+					firstFuel = runningStates.get(i).getFuel();
 					break;
 				}
 			}
 			double lastFuel = 0;
 			for (int i = runningStates.size() - 1; i >= 0; i--) {
-				if (runningStates.get(i).getGas() > 0) {
-					lastFuel = runningStates.get(i).getGas();
+				if (runningStates.get(i).getFuel() > 0) {
+					lastFuel = runningStates.get(i).getFuel();
 					break;
 				}
 			}

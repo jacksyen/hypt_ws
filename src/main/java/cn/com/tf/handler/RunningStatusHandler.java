@@ -121,8 +121,8 @@ public class RunningStatusHandler {
 		 * @param pre
 		 */
 		private void saveFule(RunningState curState, RunningState prevState) {
-			double curFuelAmount = curState.getGas();
-			double prevFuelAmount = prevState.getGas();
+			double curFuelAmount = curState.getFuel();
+			double prevFuelAmount = prevState.getFuel();
 			double curMileage = curState.getMileage();
 			double prevMileage = prevState.getMileage();
 			double refuelAmount = curFuelAmount - prevFuelAmount;

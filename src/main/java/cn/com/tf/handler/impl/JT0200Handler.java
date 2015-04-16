@@ -2,12 +2,10 @@ package cn.com.tf.handler.impl;
 
 import java.util.Calendar;
 import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import cn.com.hypt.db.model.Terminal;
 import cn.com.hypt.db.model.TerminalVehicle;
 import cn.com.hypt.db.model.Vehicle;
@@ -15,11 +13,8 @@ import cn.com.tf.handler.GpsHandler;
 import cn.com.tf.handler.IJt808Handler;
 import cn.com.tf.handler.RunningStatusHandler;
 import cn.com.tf.model.GpsInfo;
-import cn.com.tf.protocol.EMsgAck;
 import cn.com.tf.protocol.Jt808Message;
-import cn.com.tf.protocol.Jt808MessageHead;
 import cn.com.tf.protocol.impl.JT0200;
-import cn.com.tf.protocol.impl.JT8001;
 import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.JT808Constants;
 
@@ -90,13 +85,13 @@ public class JT0200Handler extends IJt808Handler {
 		gi.setSimNo(msg.getSimNo());
 		gi.setLatitude(0.000001 * body.getLatitude());
 		gi.setLongitude(0.000001 * body.getLongitude());
-		gi.setVelocity(0.1 * body.getSpeed());
+		gi.setSpeed(0.1 * body.getSpeed());
 		gi.setDirection(body.getDirection());
 		gi.setStatus(body.getStatus());
 		gi.setAlarmStatus(body.getAlarm());
 		gi.setMileage(0.1 * body.getMileage());
-		gi.setGas(0.1 * body.getFuel());
-		gi.setRecordVelocity(0.1 * body.getRecorderSpeed());
+		gi.setFuel(0.1 * body.getFuel());
+		gi.setRecordSpeed(0.1 * body.getRecorderSpeed());
 		gi.setAltitude(body.getAltitude());
 		gi.setStatus(body.getStatus());
 		//位置信息处理

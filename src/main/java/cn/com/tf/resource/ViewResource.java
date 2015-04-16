@@ -27,9 +27,22 @@ public class ViewResource {
 		return json.toString();
 	}
 	
+	/**
+	 * 跳转至轨迹回放页面
+	 * @return
+	 */
 	@RequestMapping(value="track")
 	public String goTrack(){
 	    return "track";
+	}
+	
+	/**
+	 * 跳转至车辆定位页面
+	 * @return
+	 */
+	@RequestMapping("location")
+	public String goLocation(){
+		return "location";
 	}
 
 }
