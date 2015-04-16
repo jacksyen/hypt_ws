@@ -1,6 +1,7 @@
 package cn.com.tf.resource;
 
 import java.util.Date;
+import java.util.List;
 
 import net.sf.json.JSONObject;
 
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.com.hypt.db.dao.TripMapper;
+import cn.com.hypt.db.model.Trip;
+import cn.com.hypt.db.model.TripExample;
 import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.cache.IRunningStatusCacheManager;
 import cn.com.tf.cache.ITerminalCacheManager;
@@ -54,6 +58,9 @@ public class VehicleStausResource {
 	
 	@Autowired
 	private ITmnlVehiCacheManager tmnlVehCacheManager;
+	
+	@Autowired
+	private TripMapper tripMapper;
 	
 	@RequestMapping
 	public @ResponseBody String desc(){
@@ -103,11 +110,12 @@ public class VehicleStausResource {
 	 */
 	@RequestMapping(value="trip",method=RequestMethod.GET)
 	public @ResponseBody String getTrip(@RequestParam("vid")int vehicleId){
-		Date occurTime = DateUtil.addDate(DateUtil.formatDate(new Date()), 0);
-		int occurDay = Integer.parseInt(DateUtil.DATEFORMATER().format(occurTime));
-		JSONObject json = tripCacheManager.getGpsTrip(vehicleId, occurDay);
-		if(json != null){
-			return json.toString();
+	    TripExample example = new TripExample();
+	    example.or().andVehicleIdEqualTo(vehicleId);
+	    List<Trip> list = tripMapper.selectByExampleWithBLOBs(example);
+	    
+		if(list != null && !list.isEmpty()){
+			return list.get(0).getGps();
 		}
 		return "没有轨迹点";
 	}

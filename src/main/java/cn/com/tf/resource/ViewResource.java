@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("test")
-public class PingResource {
+@RequestMapping("view")
+public class ViewResource {
 	
 	@RequestMapping(value="/welcome",method=RequestMethod.GET)
 	public String test(){
@@ -25,6 +25,11 @@ public class PingResource {
 		json.put("name", "tianfei");
 		
 		return json.toString();
+	}
+	
+	@RequestMapping(value="track")
+	public String goTrack(){
+	    return "track";
 	}
 
 }
