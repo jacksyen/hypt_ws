@@ -3,6 +3,7 @@ package cn.com.tf.resource;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,34 @@ public class VehicleStausResource {
 	public @ResponseBody String getVehicleGps(@RequestParam("vid")int vehicleId){
 		JSONObject json = dataAcquireCacheManager.getGps(vehicleId);
 		if(json != null){
+		    JSONObject j = new JSONObject();
+		    j.put("longitude", json.get("longitude"));
+		    j.put("latitude", json.get("latitude"));
+		    j.put("speed", json.get("speed"));
+		    j.put("updated", json.get("sendTime"));
+		    json.put("position", j);
+		    System.out.print(".");
 			return json.toString();
 		}
-		return "没有GPS";
+		return "";
+	}
+	
+	/**
+	 * 查询所有车辆位置信息
+	 * @return
+	 */
+	@RequestMapping("allVehicles")
+	public @ResponseBody String getAllGps(){
+	    List<Integer> list = vehicleCacheManager.findAllVehicleIds();
+	    JSONArray array = new JSONArray();
+	    for(int vId : list){
+	        JSONObject json = dataAcquireCacheManager.getGps(vId);
+	        if(json != null){
+	            array.add(json);
+	        }
+	    }
+	    
+	    return array.toString();
 	}
 	
 	/**
