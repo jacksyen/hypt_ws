@@ -81,19 +81,19 @@ public class VehicleStausResource {
 	 * @return
 	 */
 	@RequestMapping(value = "location",method=RequestMethod.GET)
-	public @ResponseBody String getVehicleGps(@RequestParam("vid")int vehicleId){
+	public @ResponseBody String getVehicleGps(@RequestParam("vid")int vehicleId,@RequestParam("updated") long updated){
 		JSONObject json = dataAcquireCacheManager.getGps(vehicleId);
-		if(json != null){
+		System.out.println(".");
+		if(json != null && json.optLong("updated") > updated){
 		    JSONObject j = new JSONObject();
 		    j.put("longitude", json.get("longitude"));
 		    j.put("latitude", json.get("latitude"));
 		    j.put("speed", json.get("speed"));
-		    j.put("updated", json.get("sendTime"));
+		    j.put("updated", json.get("updated"));
 		    json.put("position", j);
-		    System.out.print(".");
 			return json.toString();
 		}
-		return "";
+		return "{}";
 	}
 	
 	/**

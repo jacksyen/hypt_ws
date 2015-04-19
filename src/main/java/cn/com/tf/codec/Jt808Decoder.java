@@ -32,7 +32,7 @@ public class Jt808Decoder implements  ProtocolDecoder {
 			int length = in.limit();
 			in.position(length);
 			if(b[0] != JT808Constants.PROTOCOL_0x7E || b[length-1] != JT808Constants.PROTOCOL_0x7E){
-				logger.error("数据格式错误！");
+				logger.error("数据格式错误！数据内容："+ b);
 				return;
 			}
 			ByteBuffer buff = ByteBuffer.allocate(length);

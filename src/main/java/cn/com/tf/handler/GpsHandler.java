@@ -53,7 +53,7 @@ public class GpsHandler {
 				startFlag = true;
 				Thread thread = new Thread(new Runnable() {
 					public void run() {
-						logger.info("启动上行数据处理器成功！");
+						logger.info("启动GPS数据处理器成功！");
 						while(true){
 							try {
 								executorService.execute(new GpsHandlerThread(gpsQueue.take()));	//阻塞方法
@@ -117,6 +117,7 @@ public class GpsHandler {
 			gpsData.put("tid", gpsInfo.getTid());
 			String sendTime = DateUtil.TIMEFORMATER1().format(gpsInfo.getSendTime());
 			gpsData.put("sendTime", sendTime);
+			gpsData.put("updated", gpsInfo.getSendTime().getTime());
 			//保存车辆当前位置 
 			dataAcquireCacheManager.setGps(gpsData);
 			//保存车辆行程轨迹点

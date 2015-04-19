@@ -136,7 +136,7 @@
 				c = ["origin=" + c.toString(), "destination=" + f.toString(), "strategy=0"];
 				var opts = {
 					extensions: "base",
-					key: h.Conf.key,
+					key: "eb11422e622e0cc276685ee0ea4f59be",
 					output: "json"
 				};
 				for (g in opts) opts.hasOwnProperty(g) && c.push(g + "=" + opts[g]);
@@ -154,7 +154,7 @@
 			d.pathIndex = 0;
 			if (d._pass.hasOwnProperty(d.currentIndex + 1)) {
 				var c = d._pass.slice(d.currentIndex, d.currentIndex + 2);
-				if (c[0].distance(c[1]) > 1) {
+				/*if (c[0].distance(c[1]) > 1) {
 					d._getPath(c, function(a) {
 						if (a.count) {
 							for (d.pathArr = [], f = 0; f < a.route.paths.length; f++)
@@ -179,10 +179,10 @@
 							d._moveNext();
 						}
 					});
-				} else {
+				} else {*/
 					d.pathArr = d._pass.slice(d.currentIndex + 1, d.currentIndex + 2);
 					d._moveNext();
-				}
+				//}
 			}
 		},
 		isUnEmpty: function(o) {

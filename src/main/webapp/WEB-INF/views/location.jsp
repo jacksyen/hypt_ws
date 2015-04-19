@@ -82,7 +82,7 @@ $(document).ready(function(){
 	});
 	//开启实时跟踪
 	var startRealPosition = function() {
-        var vehicleId = 2,
+        var vehicleId = 1,
         data = vehicleArr[vehicleId];
         // test跟踪
             // test跟踪
@@ -103,12 +103,15 @@ $(document).ready(function(){
                     },
                     preProcess: function(r) {
                         if(r.position && !$.isEmptyObject(r.position)) {
-                            $.extend(data,r);
-                            $.extend(r,data);
+                           // $.extend(data,r);
+                            //$.extend(r,data);
                             return {lng: r.position.longitude,lat: r.position.latitude};
                         }
                         return null;
                     },
+                    success: function(r) {
+						//$('.bottom-wrap[data-form=control-details]',wraper).trigger('initDetails',[r]);
+					},
                     error: function(xhr) {
                         var result = eval('(' + xhr.responseText + ')');
                         $.jRadShowMSG({message: result[0].message, level: 'error'});

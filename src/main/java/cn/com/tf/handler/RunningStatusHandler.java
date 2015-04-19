@@ -6,12 +6,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import cn.com.hypt.db.dao.RefuelMapper;
 import cn.com.hypt.db.model.Refuel;
 import cn.com.tf.cache.IRunningStatusCacheManager;
@@ -27,7 +25,7 @@ import cn.com.tf.model.RunningState;
 @Component
 public class RunningStatusHandler {
 
-	private static Logger logger = LoggerFactory.getLogger(GpsHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(RunningStatusHandler.class);
 
 	/**
 	 * 上行消息队列
