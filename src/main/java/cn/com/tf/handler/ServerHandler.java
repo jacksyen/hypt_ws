@@ -1,5 +1,7 @@
 package cn.com.tf.handler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +78,10 @@ public class ServerHandler extends IoHandlerAdapter {
 	@Override
 	public void exceptionCaught(IoSession session, Throwable e)
 			throws Exception {
-		logger.error(String.format("SIM卡号为:%s 通讯时发生异常,异常原因为:%s,全部的异常信息如下:%s",getSimNo(session), e.getMessage(), e));
+	    StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+		logger.error(String.format("SIM卡号为:%s 通讯时发生异常,异常信息如下:%s",getSimNo(session), sw.toString()));
 	}
 
 	@Override
