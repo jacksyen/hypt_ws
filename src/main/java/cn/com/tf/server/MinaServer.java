@@ -1,6 +1,8 @@
 package cn.com.tf.server;
 
 import java.net.InetSocketAddress;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -12,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import cn.com.tf.codec.Jt808CodecFactory;
 import cn.com.tf.handler.ServerHandler;
 import cn.com.tf.protocol.Jt808Message;
+import cn.com.tf.tool.ConfigUtil;
 
 /**
  * MINA服务器
@@ -25,7 +29,7 @@ import cn.com.tf.protocol.Jt808Message;
 public class MinaServer {
 	
 	private transient static Logger logger = LoggerFactory.getLogger(MinaServer.class);
-	private static final int SERVER_PORT = 9999;
+	private static final String SERVER_PORT = "server_port";
 	private volatile boolean starting = false;
 	
 	@Autowired
@@ -40,6 +44,11 @@ public class MinaServer {
 		synchronized (this) {
 			if(acceptor == null){
 				try{
+				    int port = 8888;
+				    String cport = ConfigUtil.getConfigReader().getResourceAsProperties("config.properties").getProperty(SERVER_PORT);
+				    if(StringUtils.isNotBlank(cport)){
+				        port = Integer.parseInt(cport);
+				    }
 					//创建非阻塞的SERVER端的SOCKET
 					acceptor = new NioSocketAcceptor();
 //			acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"),
@@ -58,9 +67,9 @@ public class MinaServer {
 					acceptor.getFilterChain().addLast("heartbeat", heartBeat);
 					//绑定业务处理器
 					acceptor.setHandler(serverHandler);
-					acceptor.bind(new InetSocketAddress(SERVER_PORT));
+					acceptor.bind(new InetSocketAddress(port));
 					starting = true;
-					logger.info("服务器启动成功！端口号："+SERVER_PORT);
+					logger.info("服务器启动成功！端口号："+port);
 				} catch (Exception e) {
 					logger.info("服务启动失败！错误信息："+e.getMessage());
 				}
