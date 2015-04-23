@@ -109,7 +109,7 @@ public class MinaServer {
 		@Override
 		public Object getRequest(IoSession session) {
 			//心跳超时，断开连接 
-			logger.info(String.format("终端与平台超时断开连接，SIM：%s"), serverHandler.getSimNo(session));
+			logger.info(String.format("终端与平台超时断开连接，SIM：%s",serverHandler.getSimNo(session)));
 			session.close(true);
 			return null;
 		}
