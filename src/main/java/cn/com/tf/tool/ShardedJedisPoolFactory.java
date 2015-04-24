@@ -47,13 +47,17 @@ public class ShardedJedisPoolFactory {
 	            jConf.setMaxTotal(5000);
 
 	            List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
+	            JedisShardInfo js = null;
 	            String[] hostList = hosts.trim().split(";");
 	            for (String h : hostList) {
 	                String[] pair = h.split(":");
 	                String hostname = pair[0];
 	                Integer port = Integer.parseInt(pair[1]);
-
-	                shards.add(new JedisShardInfo(hostname, port,10000));
+	                js = new JedisShardInfo(hostname, port,10000);
+	                if(pair.length > 2){
+	                    js.setPassword(pair[2]);
+	                }
+	                shards.add(js);
 	            }
 
 	            shardedJedisPool = new ShardedJedisPool(jConf, shards);

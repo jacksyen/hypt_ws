@@ -33,10 +33,10 @@ public class JT0102Handler extends IJt808Handler {
 			msg.getConn().setAuth(true);
 		}
 		//消息回复
-		Jt808MessageHead head = msg.getHead();
-		head.setMessageId(0x8001);
-		JT8001 rbody = new JT8001(head.getFlowNo(),head.getMessageId(), optResult);
-		Jt808Message response = new Jt808Message(head,rbody);
+		Jt808MessageHead resHead = msg.getHead();
+		JT8001 rbody = new JT8001(resHead.getFlowNo(),msg.getHead().getMessageId(), optResult);
+		resHead.setMessageId(0x8001);
+		Jt808Message response = new Jt808Message(resHead,rbody);
 		writeResponse(response);
 	}
 }

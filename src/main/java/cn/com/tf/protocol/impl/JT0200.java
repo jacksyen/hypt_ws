@@ -67,7 +67,12 @@ public class JT0200 extends Jt808MessageBody {
 	}
 
 	@Override
-	public void decodeBody(ByteBuffer buff) {
+	public void decodeBody(ByteBuffer buf) {
+	    ByteBuffer buff = ByteBuffer.allocate(buf.limit());
+	    for(int i = buf.limit();i >0; i--){ 
+	        buff.put(buf.get());
+	    }
+	    buff.flip();
 		parseAlarm(Tools.getUnsignedInt(buff));		//告警
 		parseStatus(Tools.getUnsignedInt(buff));		//状态
 		latitude = Tools.getUnsignedInt(buff);
