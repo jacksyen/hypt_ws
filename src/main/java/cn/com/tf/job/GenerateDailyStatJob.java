@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cn.com.gps.hypt.common.tool.DateUtil;
 import cn.com.hypt.db.dao.DailyStatMapper;
 import cn.com.hypt.db.dao.RefuelMapper;
 import cn.com.hypt.db.model.DailyStat;
@@ -21,7 +22,6 @@ import cn.com.hypt.db.model.RefuelExample;
 import cn.com.tf.cache.IRunningStatusCacheManager;
 import cn.com.tf.cache.IVehicleCacheManager;
 import cn.com.tf.model.RunningState;
-import cn.com.tf.tool.DateUtil;
 
 /**
  * 执行日统计

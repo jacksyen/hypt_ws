@@ -11,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import redis.clients.jedis.ShardedJedis;
+import cn.com.gps.hypt.common.tool.ShardedJedisPoolFactory;
 import cn.com.hypt.db.dao.TerminalVehicleMapper;
 import cn.com.hypt.db.model.TerminalVehicle;
 import cn.com.hypt.db.model.TerminalVehicleExample;
 import cn.com.tf.cache.ITmnlVehiCacheManager;
-import cn.com.tf.tool.ShardedJedisPoolFactory;
 
 @Component
 public class TmnlVehiRedisImpl implements ITmnlVehiCacheManager {

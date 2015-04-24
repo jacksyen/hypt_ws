@@ -2,10 +2,13 @@ package cn.com.tf.handler.impl;
 
 import java.util.Calendar;
 import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import cn.com.gps.hypt.common.tool.DateUtil;
 import cn.com.hypt.db.model.Terminal;
 import cn.com.hypt.db.model.TerminalVehicle;
 import cn.com.hypt.db.model.Vehicle;
@@ -15,7 +18,6 @@ import cn.com.tf.handler.RunningStatusHandler;
 import cn.com.tf.model.GpsInfo;
 import cn.com.tf.protocol.Jt808Message;
 import cn.com.tf.protocol.impl.JT0200;
-import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.JT808Constants;
 
 /**

@@ -11,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import redis.clients.jedis.ShardedJedis;
+import cn.com.gps.hypt.common.tool.ShardedJedisPoolFactory;
 import cn.com.hypt.db.dao.TerminalMapper;
 import cn.com.hypt.db.model.Terminal;
 import cn.com.hypt.db.model.TerminalExample;
 import cn.com.tf.cache.ITerminalCacheManager;
-import cn.com.tf.tool.ShardedJedisPoolFactory;
 
 @Component
 public class TerminalRedisImpl implements ITerminalCacheManager {

@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cn.com.gps.hypt.common.tool.DateUtil;
 import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.cache.ITripCacheManager;
 import cn.com.tf.model.GpsInfo;
-import cn.com.tf.tool.DateUtil;
 import cn.com.tf.tool.LocationTool;
 
 /**

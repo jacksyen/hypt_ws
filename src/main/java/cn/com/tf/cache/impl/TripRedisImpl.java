@@ -4,8 +4,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import cn.com.gps.hypt.common.tool.ShardedJedisPoolFactory;
 import cn.com.tf.cache.ITripCacheManager;
-import cn.com.tf.tool.ShardedJedisPoolFactory;
 import redis.clients.jedis.ShardedJedis;
 import net.sf.json.JSONObject;
 

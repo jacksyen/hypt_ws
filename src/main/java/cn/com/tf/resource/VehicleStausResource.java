@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.com.gps.hypt.common.tool.DateUtil;
 import cn.com.hypt.db.dao.TripMapper;
 import cn.com.hypt.db.model.Trip;
 import cn.com.hypt.db.model.TripExample;
@@ -25,7 +26,6 @@ import cn.com.tf.cache.IVehicleCacheManager;
 import cn.com.tf.job.GenerateDailyStatJob;
 import cn.com.tf.job.GenerateTripJob;
 import cn.com.tf.model.RunningState;
-import cn.com.tf.tool.DateUtil;
 
 /**
  * 车辆状态查询接口

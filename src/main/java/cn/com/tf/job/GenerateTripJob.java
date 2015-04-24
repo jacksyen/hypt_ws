@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cn.com.gps.hypt.common.tool.DateUtil;
 import cn.com.hypt.db.dao.TripMapper;
 import cn.com.hypt.db.model.Trip;
 import cn.com.hypt.db.model.TripExample;
 import cn.com.tf.cache.ITripCacheManager;
 import cn.com.tf.cache.IVehicleCacheManager;
-import cn.com.tf.tool.DateUtil;
 
 /**
  * 生成车辆轨迹任务

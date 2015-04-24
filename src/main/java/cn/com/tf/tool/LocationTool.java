@@ -1,5 +1,6 @@
 package cn.com.tf.tool;
 
+import cn.com.gps.hypt.common.tool.RestfulInvokeService;
 import cn.com.tf.model.GpsInfo;
 import net.sf.json.JSONObject;
 

@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import redis.clients.jedis.ShardedJedis;
+import cn.com.gps.hypt.common.tool.ShardedJedisPoolFactory;
 import cn.com.tf.cache.IDataAcquireCacheManager;
 import cn.com.tf.handler.GpsHandler;
-import cn.com.tf.tool.ShardedJedisPoolFactory;
 
 @Component
 public class DataAcquireRedisImpl implements IDataAcquireCacheManager {

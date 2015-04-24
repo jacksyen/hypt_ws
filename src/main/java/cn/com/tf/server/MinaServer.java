@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cn.com.gps.hypt.common.tool.ConfigUtil;
 import cn.com.tf.codec.Jt808CodecFactory;
 import cn.com.tf.handler.ServerHandler;
 import cn.com.tf.protocol.Jt808Message;
-import cn.com.tf.tool.ConfigUtil;
 
 /**
  * MINA服务器
