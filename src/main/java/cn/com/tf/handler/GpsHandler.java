@@ -35,6 +35,7 @@ public class GpsHandler {
 	
 	private ExecutorService executorService =  Executors.newFixedThreadPool(20);
 	
+	//启动标识
 	private volatile boolean startFlag = false;
 	
 	@Autowired
@@ -54,7 +55,7 @@ public class GpsHandler {
 				Thread thread = new Thread(new Runnable() {
 					public void run() {
 						logger.info("启动GPS数据处理器成功！");
-						while(true){
+						while(startFlag){
 							try {
 								executorService.execute(new GpsHandlerThread(gpsQueue.take()));	//阻塞方法
 								Thread.sleep(300);
@@ -65,6 +66,27 @@ public class GpsHandler {
 					}
 				});
 				thread.start();
+			}
+		}
+	}
+	
+	/**
+	 * 停止GPS处理器
+	 */
+	public void stopHandler(){
+		synchronized (this) {
+			if(startFlag){
+				try {
+					while(!gpsQueue.isEmpty()){
+							Thread.sleep(200);
+					}
+					Thread.sleep(200);
+					startFlag = false;
+					executorService.shutdown();
+					logger.info("停止GPS处理器成功");
+				} catch (InterruptedException e) {
+					logger.error("停止GPS处理器异常，异常信息："+e.getMessage());
+				}
 			}
 		}
 	}
@@ -124,7 +146,6 @@ public class GpsHandler {
 			tripCacheManager.pushGpsRecord(gpsData);
 			logger.info(String.format("保存车辆【%s  %s】轨迹点成功。",gpsInfo.getVid(),sendTime));
 		}
-		
 	}
 	
 

@@ -6,10 +6,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import cn.com.hypt.db.dao.RefuelMapper;
 import cn.com.hypt.db.model.Refuel;
 import cn.com.tf.cache.IRunningStatusCacheManager;
@@ -53,7 +55,7 @@ public class RunningStatusHandler {
 				Thread thread = new Thread(new Runnable() {
 					public void run() {
 						logger.info("启动车辆运行状态处理器成功！");
-						while (true) {
+						while(startFlag) {
 							try {
 								executorService.execute(new RunningStatusThread(gpsQueue.take())); // 阻塞方法
 								Thread.sleep(300);
@@ -64,6 +66,27 @@ public class RunningStatusHandler {
 					}
 				});
 				thread.start();
+			}
+		}
+	}
+	
+	/**
+	 * 停止车辆运行状态处理器
+	 */
+	public void stopHandler(){
+		synchronized (this) {
+			if(startFlag){
+				try {
+					while(!gpsQueue.isEmpty()){
+							Thread.sleep(200);
+					}
+					Thread.sleep(200);
+					startFlag = false;
+					executorService.shutdown();
+					logger.info("停止车辆运行状态处理器成功");
+				} catch (InterruptedException e) {
+					logger.error("停止车辆运行状态处理器异常，异常信息："+e.getMessage());
+				}
 			}
 		}
 	}

@@ -36,12 +36,13 @@ public class UpDataHandler {
 	
 	private ExecutorService executorService =  Executors.newFixedThreadPool(20);
 	
+	//启动标识
 	private volatile boolean startFlag = false;
 	
 	private Map<String, IJt808Handler> codeHandler = new HashMap<String, IJt808Handler>();
 	
 	/**
-	 * 立即响应列表
+	 * 平台通用响应列表
 	 */
 	private List<String> platformCommReponse = new ArrayList<String>();
 	
@@ -59,7 +60,7 @@ public class UpDataHandler {
 				Thread thread = new Thread(new Runnable() {
 					public void run() {
 						logger.info("启动上行数据处理器成功！");
-						while(true){
+						while(startFlag){
 							try {
 								executorService.execute(new HandlerThread(updataQueue.take()));	//阻塞方法
 								Thread.sleep(300);
@@ -75,7 +76,28 @@ public class UpDataHandler {
 	}
 	
 	/**
-	 * 存放上行消息
+	 * 停止上行服务
+	 */
+	public void stopHandler(){
+		synchronized (this) {
+			if(startFlag){
+				try {
+					while(!updataQueue.isEmpty()){
+							Thread.sleep(100);
+					}
+					Thread.sleep(200);
+					startFlag = false;
+					executorService.shutdown();
+					logger.info("停止上行服务");
+				} catch (InterruptedException e) {
+					logger.error("停止上行服务异常，异常信息："+e.getMessage());
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 处理上行消息
 	 * @param msg
 	 */
 	public void add(Jt808Message msg) {

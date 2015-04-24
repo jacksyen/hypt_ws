@@ -1,7 +1,7 @@
 package cn.com.tf.server;
 
 import java.net.InetSocketAddress;
-
+import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -17,8 +17,12 @@ import org.springframework.stereotype.Component;
 
 import cn.com.gps.hypt.common.tool.ConfigUtil;
 import cn.com.tf.codec.Jt808CodecFactory;
+import cn.com.tf.handler.DownDataHandler;
 import cn.com.tf.handler.ServerHandler;
+import cn.com.tf.protocol.EMsgAck;
 import cn.com.tf.protocol.Jt808Message;
+import cn.com.tf.protocol.Jt808MessageHead;
+import cn.com.tf.protocol.impl.JT8001;
 
 /**
  * MINA服务器
@@ -32,8 +36,16 @@ public class MinaServer {
 	private static final String SERVER_PORT = "server_port";
 	private volatile boolean starting = false;
 	
+	/**
+	 * 业务处理器 
+	 */
 	@Autowired
 	private ServerHandler serverHandler;
+	/**
+	 * 下行数据处理器
+	 */
+	@Autowired
+	private DownDataHandler downDataHandler;
 	
 	private NioSocketAcceptor acceptor = null;
 	
@@ -79,14 +91,37 @@ public class MinaServer {
 		}
 	}
 	
+	/**
+	 * 停止服务器
+	 */
 	public void stopServer(){
 		synchronized (this) {
-			if(starting){
-				//TODO:关闭当前服务所有的SESSION
+			if(starting && acceptor != null){
+				//关闭当前服务所有的SESSION
+				ConcurrentMap<String, Connection> connections = serverHandler.getServerConns();
+				IoSession session = null;
+				for(Connection conn : connections.values()){
+					if(conn.isConnected()){
+						session = getSession(conn.getSessionId());
+						if(session != null){
+							session.close(true);
+							logger.info(String.format("服务器断开与SIM:%s 的连接",conn.getSimNo()));
+						}
+					}
+				}
+				//停止mina服务
+				acceptor.unbind();
+				acceptor.getFilterChain().clear();
+				acceptor.dispose();
 			}
 		}
 	}
 	
+	/**
+	 * 获取SESSION
+	 * @param sessionId
+	 * @return
+	 */
 	public IoSession getSession(long sessionId){
 		return acceptor.getManagedSessions().get(sessionId);
 	}
@@ -128,7 +163,13 @@ public class MinaServer {
 			if(request instanceof Jt808Message){
 				Jt808Message msg = (Jt808Message) request;
 				if(msg.getHead().getMessageId() == 0x002){
-					logger.info("发送心跳包响应");
+					//响应心跳包 
+					JT8001 rBody = new JT8001(msg.getHead().getFlowNo(), msg.getHead().getMessageId(),
+							EMsgAck.SUCESS.value());
+					Jt808MessageHead rHead = msg.getHead();
+					rHead.setMessageId(0x8001);
+					Jt808Message response = new Jt808Message(rHead,rBody);
+					downDataHandler.put(response);
 				}
 			}
 			return null;
