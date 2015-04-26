@@ -7,7 +7,7 @@ import cn.com.tf.protocol.Jt808MessageBody;
 import cn.com.tf.tool.Tools;
 
 /**
- * 平台能用应答
+ * 平台通用应答
  * @author tianfei
  *
  */

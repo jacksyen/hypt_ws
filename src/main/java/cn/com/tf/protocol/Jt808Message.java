@@ -69,7 +69,7 @@ public class Jt808Message {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return head.toString()+"  消息体内容："+body.toString();
+		return head.toString()+"  消息体内容："+ (body == null ? "" : body.toString());
 	}
 	
 	public static void main(String[] args){

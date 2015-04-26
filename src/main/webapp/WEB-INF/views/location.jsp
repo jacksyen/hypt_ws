@@ -37,7 +37,7 @@ $(document).ready(function(){
 	realPosition = null;// 跟踪对象
 	$.ajax({
 	       type: 'get',
-	       url: '/hypt/ws/0.1/vstatus/allVehicles',
+	       url: '/hypt/ws/0.1/monitor/allVehicles',
 	       async: false,
 	       dataType : 'JSON',
 	       cache: false,
@@ -88,7 +88,7 @@ $(document).ready(function(){
             // test跟踪
             var opts = {
                 ajaxOpts: {
-                    url: '/hypt/ws/0.1/vstatus/location',
+                    url: '/hypt/ws/0.1/monitor/location',
                     async: true,
                     dataType : 'JSON',
                     cache: false,
